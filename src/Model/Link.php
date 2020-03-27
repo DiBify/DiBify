@@ -12,38 +12,33 @@ use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\ModelManager;
 use JsonSerializable;
 
-class Link implements JsonSerializable
+final class Link implements JsonSerializable
 {
 
     /** @var Id */
-    protected $id;
+    private $id;
 
     /** @var string */
-    protected $alias;
+    private $alias;
 
     /** @var ModelInterface|null */
-    protected $model;
+    private $model;
+
+    /** @var self[] */
+    private static $preload = [];
+
+    /** @var self[] */
+    private static $links = [];
 
     /**
      * ModelPointer constructor.
-     * @param string $modelClassOrAlias
-     * @param Id|int|string $id
+     * @param string $alias
+     * @param Id $id
      */
-    public function __construct(string $modelClassOrAlias, $id)
+    private function __construct(string $alias, Id $id)
     {
-        if (is_a($modelClassOrAlias, ModelInterface::class, true)) {
-            /** @var ModelInterface $modelClassOrAlias */
-            $this->alias = $modelClassOrAlias::getModelAlias();
-        } else {
-            /** @var string $modelClassOrAlias */
-            $this->alias = $modelClassOrAlias;
-        }
-
-        if ($id instanceof Id) {
-            $this->id = $id;
-        } else {
-            $this->id = new Id($id);
-        }
+        $this->alias = $alias;
+        $this->id = $id;
     }
 
     /**
@@ -69,18 +64,27 @@ class Link implements JsonSerializable
 
     public function getModel(): ?ModelInterface
     {
-        if (is_null($this->model)) {
-            $this->model = ModelManager::findByLink($this);
+        self::preload($this);
+
+        /** @var Link[] $links */
+        $links = array_filter(self::$preload, function (Link $link) {
+            return $link->model === null;
+        });
+
+        $assoc = ModelManager::findByLinks($links);
+        foreach ($assoc as $link => $model) {
+            /** @var Link $link */
+            $link->model = $model;
         }
+
+        self::$preload = [];
+
         return $this->model;
     }
 
     /**
-     * Specify data which should be serialized to JSON
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     * @since 5.4.0
+     * @return mixed data which can be serialized by json_encode
      */
     public function jsonSerialize()
     {
@@ -90,11 +94,57 @@ class Link implements JsonSerializable
         ];
     }
 
+    /**
+     * @param string $modelClassOrAlias
+     * @param Id|string|int $id
+     * @return static
+     */
+    public static function create(string $modelClassOrAlias, $id): self
+    {
+        if (is_a($modelClassOrAlias, ModelInterface::class, true)) {
+            /** @var ModelInterface $modelClassOrAlias */
+            $alias = $modelClassOrAlias::getModelAlias();
+        } else {
+            /** @var string $alias */
+            $alias = $modelClassOrAlias;
+        }
+
+        if ($id instanceof Id) {
+            $hash = "{{" . spl_object_hash($id) . "}}";
+
+            if (!$id->isAssigned()) {
+                if (!isset(self::$links[$alias][$hash])) {
+                    self::$links[$alias][$hash] = new self($alias, $id);
+                }
+            }
+
+            if (isset(self::$links[$alias][$hash])) {
+                return self::$links[$alias][$hash];
+            }
+
+        } else {
+            $id = new Id($id);
+        }
+
+
+        $scalarId = (string) $id;
+        if (!isset(self::$links[$alias][$scalarId])) {
+            self::$links[$alias][$scalarId] = new self($alias, $id);
+        }
+
+        return self::$links[$alias][$scalarId];
+    }
+
     public static function to(ModelInterface $model): self
     {
-        $link = new static($model::getModelAlias(), $model->id());
+        $link = self::create($model::getModelAlias(), $model->id());
         $link->model = $model;
         return $link;
+    }
+
+    public static function preload(Link $link)
+    {
+        self::$preload[] = $link;
     }
 
     /**
@@ -105,7 +155,7 @@ class Link implements JsonSerializable
     {
         $data = json_decode($json, true);
         if (is_array($data) && isset($data['alias']) && isset($data['id'])) {
-            return new static($data['alias'], new Id($data['id']));
+            return self::create($data['alias'], $data['id']);
         }
         return null;
     }

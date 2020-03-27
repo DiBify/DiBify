@@ -130,7 +130,7 @@ class ModelManager
         $result = new SplObjectStorage();
         foreach ($groups as $modelName => $indexedLinks) {
             $repo = $instance->getRepository($modelName);
-            $models = $repo->findByIds(array_keys($indexedLinks));
+            $models = $repo->findByIds(array_unique(array_keys($indexedLinks)));
             foreach ($models as $model) {
                 foreach ($indexedLinks as $link) {
                     if ($link->isFor($model)) {

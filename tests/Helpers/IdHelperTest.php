@@ -19,7 +19,7 @@ class IdHelperTest extends TestCase
     {
         return [
             [new TestModel_1(1), '1'],
-            [new Link('model', 2), '2'],
+            [Link::create('model', 2), '2'],
             [new Id(3), '3'],
             [4, '4'],
             [null, null],

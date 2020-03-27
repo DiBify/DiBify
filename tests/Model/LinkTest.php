@@ -27,28 +27,38 @@ class LinkTest extends TestCase
         $this->link = Link::to($this->model);
     }
 
-    public function testConstructFromNameAndId()
+    public function testCreateFromNameAndId()
     {
         $id = new Id(1);
-        $pointer = new Link(TestModel_1::getModelAlias(), $id);
-        $this->assertSame($id, $pointer->id());
+        $pointer = Link::create(TestModel_1::getModelAlias(), $id);
+        $this->assertSame((string) $id, (string) $pointer->id());
     }
 
-    public function testConstructFromClassAndId()
+    public function testCreateFromClassAndId()
     {
-        $link = new Link(TestModel_1::class, new Id(1));
+        $link = Link::create(TestModel_1::class, new Id(1));
         $this->assertEquals(TestModel_1::getModelAlias(), $link->getModelAlias());
     }
 
-    public function testConstructScalarId()
+    public function testCreateScalarId()
     {
-        $link = new Link(TestModel_1::class, 1);
+        $link = Link::create(TestModel_1::class, 1);
         $this->assertEquals(TestModel_1::getModelAlias(), $link->getModelAlias());
+    }
+
+    public function testToNewModel()
+    {
+        $model = new TestModel_1();
+        $link = Link::to($model);
+
+        $this->assertSame($model, $link->getModel());
+        $this->assertSame($model->id(), $link->getModel()->id());
+
     }
 
     public function testId()
     {
-        $this->assertSame($this->model->id(), $this->link->id());
+        $this->assertSame((string) $this->model->id(), (string) $this->link->id());
     }
 
     public function testGetModelAlias()

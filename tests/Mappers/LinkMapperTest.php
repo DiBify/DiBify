@@ -16,7 +16,7 @@ class LinkMapperTest extends MapperTestCase
     {
         return [
             [
-                new Link('model', new Id(1)),
+                Link::create('model', new Id(1)),
                 ['id' => '1', 'alias' => 'model']
             ],
         ];
@@ -39,7 +39,7 @@ class LinkMapperTest extends MapperTestCase
         return [
             [
                 ['id' => '1', 'alias' => 'model'],
-                new Link('model', new Id(1))
+                Link::create('model', new Id(1))
             ],
         ];
     }
