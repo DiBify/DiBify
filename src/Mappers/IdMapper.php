@@ -35,6 +35,11 @@ class IdMapper implements MapperInterface
         if (!is_string($data) && !is_int($data) && !is_float($data)) {
             throw new SerializerException("Id expected, but '" . gettype($data) . "' passed");
         }
+
+        if ($data === '') {
+            throw new SerializerException("Id expected, empty value passed");
+        }
+
         return new Id($data);
     }
 }

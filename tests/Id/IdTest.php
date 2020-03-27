@@ -50,6 +50,11 @@ class IdTest extends TestCase
         $this->assertTrue($this->temp->assign(1));
     }
 
+    public function testAssignEmpty()
+    {
+        $this->assertFalse($this->temp->assign(''));
+    }
+
     public function testIsEqual()
     {
         $modelPermanent = $this->createMock(ModelInterface::class);
@@ -88,12 +93,6 @@ class IdTest extends TestCase
             '"hello"',
             json_encode(new Id('hello'))
         );
-    }
-
-    public function testAsString()
-    {
-        $this->assertEquals(1, (string) $this->permanent);
-        $this->assertEquals((string) $this->temp, '');
     }
 
     public function testNonStrictCompare()

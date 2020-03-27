@@ -43,6 +43,10 @@ class Id implements JsonSerializable
      */
     public function assign(string $id): bool
     {
+        if ($id === '') {
+            return false;
+        }
+
         if (!$this->isAssigned()) {
             $this->value = $id;
             return true;
