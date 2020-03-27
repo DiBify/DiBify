@@ -14,17 +14,20 @@ use DiBify\DiBify\Model\Link;
 class IdToLinkMapper implements MapperInterface
 {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $alias;
 
+    /** @var IdMapper */
     private $idMapper;
 
-    public function __construct(string $alias)
+    /** @var bool */
+    private $lazy;
+
+    public function __construct(string $alias, bool $lazy = true)
     {
         $this->alias = $alias;
         $this->idMapper = new IdMapper();
+        $this->lazy = $lazy;
     }
 
     /**
@@ -47,6 +50,12 @@ class IdToLinkMapper implements MapperInterface
     public function deserialize($data)
     {
         $id = $this->idMapper->deserialize($data);
-        return Link::create($this->alias, $id);
+        $link = Link::create($this->alias, $id);
+
+        if ($this->lazy) {
+            Link::preload($link);
+        }
+
+        return $link;
     }
 }
