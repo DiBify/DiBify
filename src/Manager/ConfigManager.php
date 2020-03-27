@@ -21,7 +21,7 @@ class ConfigManager
     protected $classToIdGenerator;
 
     /** @var array */
-    protected $nameToClass;
+    protected $aliasToClass;
 
     public function add($repoOrCallable, array $modelClasses, IdGeneratorInterface $idGenerator)
     {
@@ -29,7 +29,7 @@ class ConfigManager
             /** @var ModelInterface|string $class */
             $this->classToRepo[$class] = $repoOrCallable;
             $this->classToIdGenerator[$class] = $idGenerator;
-            $this->nameToClass[$class::getModelName()] = $class;
+            $this->aliasToClass[$class::getModelAlias()] = $class;
         }
     }
 
@@ -76,15 +76,15 @@ class ConfigManager
         }
 
         if ($anyModelPointer instanceof Link) {
-            $anyModelPointer = $anyModelPointer->getModelName();
+            $anyModelPointer = $anyModelPointer->getModelAlias();
         }
 
         if (!is_string($anyModelPointer)) {
-            throw new InvalidArgumentException('Argument should be ModelInterface, Link, model class or name');
+            throw new InvalidArgumentException('Argument should be ModelInterface, Link, model class or alias');
         }
 
-        if (isset($this->nameToClass[$anyModelPointer])) {
-            return $this->nameToClass[$anyModelPointer];
+        if (isset($this->aliasToClass[$anyModelPointer])) {
+            return $this->aliasToClass[$anyModelPointer];
         }
 
         if (isset($this->classToRepo[$anyModelPointer])) {

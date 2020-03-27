@@ -104,15 +104,15 @@ class ModelManagerTest extends TestCase
 
     public function testFindByLink()
     {
-        $link = new Link(TestModel_1::getModelName(), 2);
+        $link = new Link(TestModel_1::getModelAlias(), 2);
         $model = $this->manager->findByLink($link);
         $this->assertTrue($link->isFor($model));
     }
 
     public function testFindByLinks()
     {
-        $link_1 = new Link(TestModel_1::getModelName(), 1);
-        $link_2 = new Link(TestModel_2::getModelName(), 2);
+        $link_1 = new Link(TestModel_1::getModelAlias(), 1);
+        $link_2 = new Link(TestModel_2::getModelAlias(), 2);
 
         $storage = $this->manager->findByLinks([$link_1, $link_2]);
         $this->assertTrue($link_1->isFor($storage[$link_1]));
@@ -134,7 +134,7 @@ class ModelManagerTest extends TestCase
             $this->manager->findByAnyTypeId($model)
         );
 
-        $link = new Link(TestModel_1::getModelName(), 2);
+        $link = new Link(TestModel_1::getModelAlias(), 2);
         $model = $this->manager->findByAnyTypeId($link);
         $this->assertInstanceOf(TestModel_1::class, $model);
         $this->assertEquals('2', (string) $model->id());

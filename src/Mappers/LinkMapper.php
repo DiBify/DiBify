@@ -17,7 +17,7 @@ class LinkMapper extends ObjectMapper
     {
         parent::__construct(Link::class, [
             'id' => new IdMapper(),
-            'model' => new StringMapper()
+            'alias' => new StringMapper()
         ]);
     }
 

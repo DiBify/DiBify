@@ -30,20 +30,20 @@ class LinkTest extends TestCase
     public function testConstructFromNameAndId()
     {
         $id = new Id(1);
-        $pointer = new Link(TestModel_1::getModelName(), $id);
+        $pointer = new Link(TestModel_1::getModelAlias(), $id);
         $this->assertSame($id, $pointer->id());
     }
 
     public function testConstructFromClassAndId()
     {
         $link = new Link(TestModel_1::class, new Id(1));
-        $this->assertEquals(TestModel_1::getModelName(), $link->getModelName());
+        $this->assertEquals(TestModel_1::getModelAlias(), $link->getModelAlias());
     }
 
     public function testConstructScalarId()
     {
         $link = new Link(TestModel_1::class, 1);
-        $this->assertEquals(TestModel_1::getModelName(), $link->getModelName());
+        $this->assertEquals(TestModel_1::getModelAlias(), $link->getModelAlias());
     }
 
     public function testId()
@@ -51,15 +51,15 @@ class LinkTest extends TestCase
         $this->assertSame($this->model->id(), $this->link->id());
     }
 
-    public function testGetModelName()
+    public function testGetModelAlias()
     {
-        $this->assertEquals($this->model::getModelName(), $this->link->getModelName());
+        $this->assertEquals($this->model::getModelAlias(), $this->link->getModelAlias());
     }
 
     public function testToJson()
     {
         $expected = json_encode([
-            'model' => $this->model::getModelName(),
+            'alias' => $this->model::getModelAlias(),
             'id' => (string) $this->model->id(),
         ]);
         $this->assertEquals($expected, json_encode($this->link));
@@ -78,7 +78,7 @@ class LinkTest extends TestCase
         $this->assertNull(Link::fromJson('null'));
         $this->assertNull(Link::fromJson('[]'));
         $this->assertNull(Link::fromJson('{}'));
-        $this->assertNull(Link::fromJson('{"model": "name"}'));
+        $this->assertNull(Link::fromJson('{"alias": "name"}'));
         $this->assertNull(Link::fromJson('{"id": 123}'));
     }
 

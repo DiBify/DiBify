@@ -13,6 +13,6 @@ interface ModelInterface
 
     public function id(): Id;
 
-    public static function getModelName():string;
+    public static function getModelAlias():string;
 
 }

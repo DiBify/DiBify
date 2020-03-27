@@ -77,14 +77,14 @@ class ModelManager
     }
 
     /**
-     * @param $modelObjectOrClassOrName
+     * @param $modelObjectOrClassOrAlias
      * @return Repository
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function getRepository($modelObjectOrClassOrName): Repository
+    public function getRepository($modelObjectOrClassOrAlias): Repository
     {
-        $repo = $this->configManager->getRepository($modelObjectOrClassOrName);
+        $repo = $this->configManager->getRepository($modelObjectOrClassOrAlias);
         $this->repositories[get_class($repo)] = $repo;
         return $repo;
     }
@@ -97,7 +97,7 @@ class ModelManager
      */
     public function findByLink(Link $link): ?ModelInterface
     {
-        $repo = $this->getRepository($link->getModelName());
+        $repo = $this->getRepository($link->getModelAlias());
         return $repo->findById($link->id());
     }
 
@@ -114,9 +114,9 @@ class ModelManager
             if (!($link instanceof Link)) {
                 throw new InvalidArgumentException("Every link should be instance of " . Link::class, 1);
             }
-            $name = $link->getModelName();
+            $alias = $link->getModelAlias();
             $id = (string) $link->id();
-            $groups[$name][$id] = $link;
+            $groups[$alias][$id] = $link;
         }
 
         $result = new SplObjectStorage();
@@ -136,12 +136,12 @@ class ModelManager
 
     /**
      * @param ModelInterface|Link|Id|string|int $argument
-     * @param string|null $modelNameOrClass
+     * @param string|null $modelAliasOrClass
      * @return ModelInterface|null
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function findByAnyTypeId($argument, string $modelNameOrClass = null): ?ModelInterface
+    public function findByAnyTypeId($argument, string $modelAliasOrClass = null): ?ModelInterface
     {
         if ($argument instanceof ModelInterface) {
             return $argument;
@@ -151,7 +151,7 @@ class ModelManager
             return $this->findByLink($argument);
         }
 
-        $repo = $this->getRepository($modelNameOrClass);
+        $repo = $this->getRepository($modelAliasOrClass);
         return $repo->findById($argument);
     }
 

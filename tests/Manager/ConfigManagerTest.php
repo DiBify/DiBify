@@ -71,15 +71,15 @@ class ConfigManagerTest extends TestCase
     {
         return [
             [TestModel_1::class, TestRepo_1::class, TestModel_1::class, 0],
-            [TestModel_1::getModelName(), TestRepo_1::class, TestModel_1::class, 0],
+            [TestModel_1::getModelAlias(), TestRepo_1::class, TestModel_1::class, 0],
             [new TestModel_1(), TestRepo_1::class, TestModel_1::class, 0],
-            [new Link(TestModel_1::getModelName(), new Id(1)), TestRepo_1::class, TestModel_1::class, 0],
+            [new Link(TestModel_1::getModelAlias(), new Id(1)), TestRepo_1::class, TestModel_1::class, 0],
             [TestModel_1_1::class, TestRepo_1::class, TestModel_1_1::class, 0],
 
             [TestModel_2::class, TestRepo_2::class, TestModel_2::class, 1],
-            [TestModel_2::getModelName(), TestRepo_2::class, TestModel_2::class, 1],
+            [TestModel_2::getModelAlias(), TestRepo_2::class, TestModel_2::class, 1],
             [new TestModel_2(), TestRepo_2::class, TestModel_2::class, 1],
-            [new Link(TestModel_2::getModelName(), new Id(2)), TestRepo_2::class, TestModel_2::class, 1],
+            [new Link(TestModel_2::getModelAlias(), new Id(2)), TestRepo_2::class, TestModel_2::class, 1],
             [TestModel_2_2::class, TestRepo_2::class, TestModel_2_2::class, 1],
         ];
     }
@@ -137,15 +137,15 @@ class ConfigManagerTest extends TestCase
     {
         return [
             [TestModel_1::class, 1],
-            [TestModel_1::getModelName(), 1],
+            [TestModel_1::getModelAlias(), 1],
             [new TestModel_1(), 1],
-            [new Link(TestModel_1::getModelName(), new Id(1)), 1],
+            [new Link(TestModel_1::getModelAlias(), new Id(1)), 1],
             [TestModel_1_1::class, 1],
 
             [TestModel_2::class, 2],
-            [TestModel_2::getModelName(), 2],
+            [TestModel_2::getModelAlias(), 2],
             [new TestModel_2(), 2],
-            [new Link(TestModel_2::getModelName(), new Id(1)), 2],
+            [new Link(TestModel_2::getModelAlias(), new Id(1)), 2],
             [TestModel_2_2::class, 2],
         ];
     }

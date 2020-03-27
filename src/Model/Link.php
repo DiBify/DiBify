@@ -18,21 +18,21 @@ class Link implements JsonSerializable
     protected $id;
 
     /** @var string */
-    protected $model;
+    protected $alias;
 
     /**
      * ModelPointer constructor.
-     * @param string $modelClassOrName
+     * @param string $modelClassOrAlias
      * @param Id|int|string $id
      */
-    public function __construct(string $modelClassOrName, $id)
+    public function __construct(string $modelClassOrAlias, $id)
     {
-        if (is_a($modelClassOrName, ModelInterface::class, true)) {
-            /** @var ModelInterface $modelClassOrName */
-            $this->model = $modelClassOrName::getModelName();
+        if (is_a($modelClassOrAlias, ModelInterface::class, true)) {
+            /** @var ModelInterface $modelClassOrAlias */
+            $this->alias = $modelClassOrAlias::getModelAlias();
         } else {
-            /** @var string $modelClassOrName */
-            $this->model = $modelClassOrName;
+            /** @var string $modelClassOrAlias */
+            $this->alias = $modelClassOrAlias;
         }
 
         if ($id instanceof Id) {
@@ -53,14 +53,14 @@ class Link implements JsonSerializable
     /**
      * @return string
      */
-    public function getModelName(): string
+    public function getModelAlias(): string
     {
-        return $this->model;
+        return $this->alias;
     }
 
     public function isFor(ModelInterface $model): bool
     {
-        return $this->getModelName() === $model::getModelName() && $this->id->isEqual($model);
+        return $this->getModelAlias() === $model::getModelAlias() && $this->id->isEqual($model);
     }
 
     /**
@@ -73,14 +73,14 @@ class Link implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'model' => $this->model,
+            'alias' => $this->alias,
             'id' => (string) $this->id,
         ];
     }
 
     public static function to(ModelInterface $model): self
     {
-        return new static($model::getModelName(), $model->id());
+        return new static($model::getModelAlias(), $model->id());
     }
 
     /**
@@ -90,8 +90,8 @@ class Link implements JsonSerializable
     public static function fromJson(string $json): ?self
     {
         $data = json_decode($json, true);
-        if (is_array($data) && isset($data['model']) && isset($data['id'])) {
-            return new static($data['model'], new Id($data['id']));
+        if (is_array($data) && isset($data['alias']) && isset($data['id'])) {
+            return new static($data['alias'], new Id($data['id']));
         }
         return null;
     }

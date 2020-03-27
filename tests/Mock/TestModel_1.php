@@ -44,7 +44,7 @@ class TestModel_1 implements ModelInterface
         return $this->custom;
     }
 
-    public static function getModelName(): string
+    public static function getModelAlias(): string
     {
         return 'model_1';
     }
