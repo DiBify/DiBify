@@ -54,6 +54,10 @@ class ModelManager
      * @var callable
      */
     private $onCommitException;
+    /**
+     * @var static
+     */
+    private static $instance;
 
     public function __construct(
         ConfigManager $configManager,
@@ -69,6 +73,8 @@ class ModelManager
         $this->onBeforeCommit = $onBeforeCommit ?? function () {};
         $this->onAfterCommit = $onAfterCommit ?? function () {};
         $this->onCommitException = $onCommitException ?? function () {};
+
+        static::$instance = $this;
     }
 
     public function getLocker(): LockerInterface
@@ -95,9 +101,10 @@ class ModelManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function findByLink(Link $link): ?ModelInterface
+    public static function findByLink(Link $link): ?ModelInterface
     {
-        $repo = $this->getRepository($link->getModelAlias());
+        $instance = static::$instance;
+        $repo = $instance->getRepository($link->getModelAlias());
         return $repo->findById($link->id());
     }
 
@@ -107,8 +114,9 @@ class ModelManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function findByLinks(array $links): SplObjectStorage
+    public static function findByLinks(array $links): SplObjectStorage
     {
+        $instance = static::$instance;
         $groups = [];
         foreach ($links as $link) {
             if (!($link instanceof Link)) {
@@ -121,7 +129,7 @@ class ModelManager
 
         $result = new SplObjectStorage();
         foreach ($groups as $modelName => $indexedLinks) {
-            $repo = $this->getRepository($modelName);
+            $repo = $instance->getRepository($modelName);
             $models = $repo->findByIds(array_keys($indexedLinks));
             foreach ($models as $model) {
                 foreach ($indexedLinks as $link) {
