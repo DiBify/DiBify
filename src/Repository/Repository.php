@@ -119,7 +119,7 @@ abstract class Repository
      */
     protected function isRegistered(ModelInterface $model): bool
     {
-        return isset($this->registered[(string) $model->id()]);
+        return isset($this->registered[get_class($model)][(string) $model->id()]);
     }
 
     /**
@@ -136,17 +136,17 @@ abstract class Repository
         $class = get_class($model);
         $id = (string) $model->id();
 
-        if (isset($this->registered[$id]) && $this->registered[$id] !== $model) {
+        if (isset($this->registered[$class][$id]) && $this->registered[$class][$id] !== $model) {
             throw new DuplicateModelException("Model with class '{$class}' and id '{$id}' already registered");
         }
 
-        $this->registered[$id] = $model;
+        $this->registered[$class][$id] = $model;
     }
 
     protected function unregister(ModelInterface $model): void
     {
         if ($model->id()->isAssigned()) {
-            unset($this->registered[(string) $model->id()]);
+            unset($this->registered[get_class($model)][(string) $model->id()]);
         }
     }
 
