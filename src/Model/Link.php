@@ -9,6 +9,7 @@ namespace DiBify\DiBify\Model;
 
 
 use DiBify\DiBify\Id\Id;
+use DiBify\DiBify\Manager\ModelManager;
 use JsonSerializable;
 
 class Link implements JsonSerializable
@@ -19,6 +20,9 @@ class Link implements JsonSerializable
 
     /** @var string */
     protected $alias;
+
+    /** @var ModelInterface|null */
+    protected $model;
 
     /**
      * ModelPointer constructor.
@@ -63,6 +67,14 @@ class Link implements JsonSerializable
         return $this->getModelAlias() === $model::getModelAlias() && $this->id->isEqual($model);
     }
 
+    public function getModel(): ?ModelInterface
+    {
+        if (is_null($this->model)) {
+            $this->model = ModelManager::findByLink($this);
+        }
+        return $this->model;
+    }
+
     /**
      * Specify data which should be serialized to JSON
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -80,7 +92,9 @@ class Link implements JsonSerializable
 
     public static function to(ModelInterface $model): self
     {
-        return new static($model::getModelAlias(), $model->id());
+        $link = new static($model::getModelAlias(), $model->id());
+        $link->model = $model;
+        return $link;
     }
 
     /**

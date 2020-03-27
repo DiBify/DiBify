@@ -56,6 +56,11 @@ class LinkTest extends TestCase
         $this->assertEquals($this->model::getModelAlias(), $this->link->getModelAlias());
     }
 
+    public function testGetModel()
+    {
+        $this->assertSame($this->model, $this->link->getModel());
+    }
+
     public function testToJson()
     {
         $expected = json_encode([
@@ -69,7 +74,8 @@ class LinkTest extends TestCase
     {
         $json = json_encode($this->link);
         $link = Link::fromJson($json);
-        $this->assertEquals($this->link, $link);
+        $this->assertEquals($this->link->id(), $link->id());
+        $this->assertEquals($this->link->getModelAlias(), $link->getModelAlias());
     }
 
     public function testFromJsonNullOrFail()
