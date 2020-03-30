@@ -231,7 +231,7 @@ class ModelManager
      * @throws Throwable
      * @throws UnknownModelException
      */
-    public function commit(Lock $lock): Commit
+    public function commit(Lock $lock = null): Commit
     {
         $commit = new Commit($this->persisted, $this->deleted);
 
@@ -294,9 +294,7 @@ class ModelManager
                     throw new LockedModelException();
                 }
 
-                if ($lock) {
-                    $this->getLocker()->lock($model, $lock->getLocker(), $lock->getTimeout());
-                }
+                $this->getLocker()->lock($model, $lock->getLocker(), $lock->getTimeout());
             }
         }
     }
