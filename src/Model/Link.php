@@ -64,6 +64,10 @@ final class Link implements JsonSerializable
 
     public function getModel(): ?ModelInterface
     {
+        if ($this->model) {
+            return $this->model;
+        }
+
         self::preload($this);
 
         /** @var Link[] $links */
