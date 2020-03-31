@@ -29,10 +29,10 @@ interface LockerInterface
      * @param ModelInterface $model
      * @param ModelInterface $currentLocker
      * @param ModelInterface $nextLocker
-     * @param int $timeout
+     * @param int|null $timeout
      * @return bool
      */
-    public function passLock(ModelInterface $model, ModelInterface $currentLocker, ModelInterface $nextLocker, int $timeout): bool;
+    public function passLock(ModelInterface $model, ModelInterface $currentLocker, ModelInterface $nextLocker, int $timeout = null): bool;
 
     /**
      * @param ModelInterface $model
