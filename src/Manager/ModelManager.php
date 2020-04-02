@@ -272,10 +272,11 @@ class ModelManager
     }
 
     /**
-     * FreeUp all preloaded models in all repositories
+     * FreeUp all preloaded models in all repositories and all links
      */
     public function freeUpMemory(): void
     {
+        Link::freeUpMemory();
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }

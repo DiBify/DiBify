@@ -23,6 +23,7 @@ class LinkTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Link::freeUpMemory();
         $this->model = new TestModel_1(1);
         $this->link = Link::to($this->model);
     }

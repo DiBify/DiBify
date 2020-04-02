@@ -146,9 +146,15 @@ final class Link implements JsonSerializable
         return $link;
     }
 
-    public static function preload(Link $link)
+    public static function preload(Link $link): void
     {
         self::$preload[] = $link;
+    }
+
+    public static function freeUpMemory(): void
+    {
+        self::$preload = [];
+        self::$links = [];
     }
 
     /**
