@@ -36,10 +36,10 @@ interface LockerInterface
 
     /**
      * @param ModelInterface $model
-     * @param ModelInterface|null $locker
+     * @param ModelInterface $locker
      * @return bool
      */
-    public function isLockedFor(ModelInterface $model, ?ModelInterface $locker): bool;
+    public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool;
 
     /**
      * @param ModelInterface|Link $modelOrLink
