@@ -109,7 +109,6 @@ final class Link implements JsonSerializable
             /** @var ModelInterface $modelClassOrAlias */
             $alias = $modelClassOrAlias::getModelAlias();
         } else {
-            /** @var string $alias */
             $alias = $modelClassOrAlias;
         }
 
