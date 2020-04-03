@@ -56,7 +56,7 @@ class DummyLocker implements LockerInterface
         return true;
     }
 
-    public function isLockedFor(ModelInterface $model, ?ModelInterface $locker): bool
+    public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool
     {
         $name = $model::getModelAlias();
         $id = (string) $model->id();
