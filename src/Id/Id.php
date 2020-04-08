@@ -61,7 +61,11 @@ class Id implements JsonSerializable
     public function isEqual($modelOrId): bool
     {
         if ($modelOrId instanceof self) {
-            return (string) $modelOrId === (string) $this;
+            if ($this->isAssigned()) {
+                return (string) $modelOrId === (string) $this;
+            } else {
+                return $modelOrId === $this;
+            }
         }
 
         if ($modelOrId instanceof ModelInterface) {
