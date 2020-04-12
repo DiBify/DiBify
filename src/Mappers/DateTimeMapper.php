@@ -25,7 +25,7 @@ class DateTimeMapper implements MapperInterface
     }
 
     /**
-     * Превращает сложный объект в простой тип (scalar, null, array)
+     * Convert complex data (like object) to simpe data (scalar, null, array)
      * @param DateTimeInterface $complex
      * @return string|null
      * @throws SerializerException
@@ -40,7 +40,7 @@ class DateTimeMapper implements MapperInterface
     }
 
     /**
-     * Превращает простой тип (scalar, null, array) в сложный (object)
+     * Convert simple data (scalar, null, array) into complex data (like object)
      * @param string|null $data
      * @return DateTimeInterface
      * @throws SerializerException

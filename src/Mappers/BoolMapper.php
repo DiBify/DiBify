@@ -14,7 +14,7 @@ class BoolMapper implements MapperInterface
 {
 
     /**
-     * Превращает сложный объект в простой тип (scalar, null, array)
+     * Convert complex data (like object) to simpe data (scalar, null, array)
      * @param $complex
      * @return bool
      * @throws SerializerException
@@ -29,7 +29,7 @@ class BoolMapper implements MapperInterface
     }
 
     /**
-     * Превращает простой тип (scalar, null, array) в сложный (object)
+     * Convert simple data (scalar, null, array) into complex data (like object)
      * @param mixed $data
      * @return bool
      * @throws SerializerException

@@ -28,7 +28,7 @@ class UnionMapper implements MapperInterface
     }
 
     /**
-     * Превращает сложный объект в простой тип (scalar, null, array)
+     * Convert complex data (like object) to simpe data (scalar, null, array)
      * @param $complex
      * @return mixed
      * @throws SerializerException
@@ -48,7 +48,7 @@ class UnionMapper implements MapperInterface
     }
 
     /**
-     * Превращает простой тип (scalar, null, array) в сложный (object)
+     * Convert simple data (scalar, null, array) into complex data (like object)
      * @param mixed $data
      * @return mixed
      * @throws SerializerException
