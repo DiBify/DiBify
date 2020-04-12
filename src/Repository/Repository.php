@@ -11,8 +11,10 @@ use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\Commit;
+use DiBify\DiBify\Model\Link;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
+use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
 
 abstract class Repository
@@ -73,21 +75,23 @@ abstract class Repository
 
     /**
      * @param ModelInterface $model
-     * @return array
+     * @return StorageData
      */
-    abstract protected function extract(ModelInterface $model): array;
+    abstract protected function extract(ModelInterface $model): StorageData;
 
     /**
-     * @param array $data
+     * @param StorageData $data
      * @return ModelInterface
      */
-    abstract protected function hydrate(array $data): ModelInterface;
+    abstract protected function hydrate(StorageData $data): ModelInterface;
 
     /**
-     * @param array $data
+     * @param StorageData $data
      * @return ModelInterface
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
      */
-    protected function populateOne(array $data): ModelInterface
+    protected function populateOne(StorageData $data): ModelInterface
     {
         $model = $this->hydrate($data);
 
@@ -101,7 +105,7 @@ abstract class Repository
 
 
     /**
-     * @param array[] $array
+     * @param StorageData[] $array
      * @return ModelInterface[]
      */
     protected function populateMany(array $array): array
@@ -139,6 +143,8 @@ abstract class Repository
         if (isset($this->registered[$class][$id]) && $this->registered[$class][$id] !== $model) {
             throw new DuplicateModelException("Model with class '{$class}' and id '{$id}' already registered");
         }
+
+        Link::to($model);
 
         $this->registered[$class][$id] = $model;
     }

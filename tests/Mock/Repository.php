@@ -6,6 +6,7 @@ namespace DiBify\DiBify\Mock;
 use DiBify\DiBify\Manager\Commit;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\DirectReplicator;
+use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
 
 abstract class Repository extends \DiBify\DiBify\Repository\Repository
@@ -93,12 +94,12 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
         }
     }
 
-    protected function hydrate(array $data): ModelInterface
+    protected function hydrate(StorageData $data): ModelInterface
     {
         //Empty for mock
     }
 
-    protected function extract(ModelInterface $model): array
+    protected function extract(ModelInterface $model): StorageData
     {
         //Empty for mock
     }

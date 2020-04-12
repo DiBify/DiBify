@@ -15,17 +15,17 @@ interface StorageInterface
      * @param int|string $id
      * @return array|null
      */
-    public function findById(string $id): ?array;
+    public function findById(string $id): ?StorageData;
 
     /**
      * @param string[] $ids
-     * @return array[]
+     * @return StorageData[]
      */
     public function findByIds($ids): array;
 
-    public function insert(string $id, array $data): void;
+    public function insert(StorageData $data): void;
 
-    public function update(string $id, array $data): void;
+    public function update(StorageData $data): void;
 
     public function delete(string $id): void;
 
