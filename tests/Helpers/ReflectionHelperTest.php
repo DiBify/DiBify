@@ -10,7 +10,9 @@ namespace DiBify\DiBify\Helpers;
 use ArrayObject;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Mock\TestModel_1;
+use DiBify\DiBify\Mock\TestModel_2;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class ReflectionHelperTest extends TestCase
 {
@@ -69,5 +71,23 @@ class ReflectionHelperTest extends TestCase
             $id,
             $this->arrayAccess['otherId']
         );
+    }
+
+    public function testGetMethod()
+    {
+        $method_1 = ReflectionHelper::getMethod($this->model, 'onBeforeCommit');
+        $this->assertInstanceOf(ReflectionMethod::class, $method_1);
+        $this->assertEquals('onBeforeCommit', $method_1->getName());
+
+        $method_2 = ReflectionHelper::getMethod(TestModel_2::class, 'onBeforeCommit');
+        $this->assertInstanceOf(ReflectionMethod::class, $method_2);
+        $this->assertEquals('onBeforeCommit', $method_2->getName());
+
+        $method_3 = ReflectionHelper::getMethod(TestModel_1::class, 'onAfterCommit');
+        $this->assertInstanceOf(ReflectionMethod::class, $method_3);
+        $this->assertEquals('onAfterCommit', $method_3->getName());
+
+        $this->assertNotSame($method_1, $method_2);
+        $this->assertNotSame($method_1, $method_3);
     }
 }

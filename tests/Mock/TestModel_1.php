@@ -17,6 +17,9 @@ class TestModel_1 implements ModelInterface
     protected $otherId;
     protected $custom;
 
+    public $onBeforeCommit = false;
+    public $onAfterCommit = false;
+
     public function __construct($id = null, $otherId = null, $custom = null)
     {
         $this->id = new Id($id);
@@ -44,8 +47,19 @@ class TestModel_1 implements ModelInterface
         return $this->custom;
     }
 
+    protected function onBeforeCommit(): void
+    {
+        $this->onBeforeCommit = true;
+    }
+
+    protected function onAfterCommit(): void
+    {
+        $this->onAfterCommit = true;
+    }
+
     public static function getModelAlias(): string
     {
         return 'model_1';
     }
+
 }

@@ -10,6 +10,7 @@ namespace DiBify\DiBify\Helpers;
 use ArrayAccess;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use ReflectionProperty;
 
 class ReflectionHelper
@@ -20,6 +21,9 @@ class ReflectionHelper
 
     /** @var ReflectionProperty[] */
     private static $reflectionProperties = [];
+
+    /** @var ReflectionMethod[] */
+    private static $reflectionMethods = [];
 
     /**
      * @param string $class
@@ -75,6 +79,16 @@ class ReflectionHelper
                 throw $reflectionException;
             }
         }
+    }
+
+    public static function getMethod($classOrObject, string $method): ReflectionMethod
+    {
+        $className = is_object($classOrObject) ? get_class($classOrObject) : (string) $classOrObject;
+        $key = $className . '::' . $method . '()';
+        if (!isset(self::$reflectionMethods[$key])) {
+            self::$reflectionMethods[$key] = new ReflectionMethod($className, $method);
+        }
+        return self::$reflectionMethods[$key];
     }
 
       /**
