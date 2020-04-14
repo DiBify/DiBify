@@ -9,6 +9,7 @@ namespace DiBify\DiBify\Manager;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
+use DiBify\DiBify\Helpers\ReflectionHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Locker\Lock\ServiceLock;
 use DiBify\DiBify\Locker\Lock\Lock;
@@ -17,6 +18,7 @@ use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Model\Link;
 use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Repository\Repository;
+use ReflectionMethod;
 use SplObjectStorage;
 use Throwable;
 
@@ -241,6 +243,13 @@ class ModelManager
             $idGenerator($model);
         }
 
+        //onBeforeCommit
+        foreach ($commit->getPersisted() as $model) {
+            if (method_exists($model, 'onBeforeCommit')) {
+                $this->runModelEvent($model, 'onBeforeCommit');
+            }
+        }
+
         ($this->onBeforeCommit)($commit);
         $models = array_merge($commit->getPersisted(), $commit->getDeleted());
 
@@ -253,6 +262,13 @@ class ModelManager
             }
 
             ($this->onAfterCommit)($commit);
+
+            //onAfterCommit
+            foreach ($commit->getPersisted() as $model) {
+                if (method_exists($model, 'onAfterCommit')) {
+                    $this->runModelEvent($model, 'onAfterCommit');
+                }
+            }
 
             if ($lock instanceof ServiceLock) {
                 $this->unlock($models, $lock);
@@ -280,6 +296,13 @@ class ModelManager
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }
+    }
+
+    protected function runModelEvent(ModelInterface $model, string $method)
+    {
+        $method = ReflectionHelper::getMethod($model, $method);
+        $method->setAccessible(true);
+        $method->invoke($model);
     }
 
     /**

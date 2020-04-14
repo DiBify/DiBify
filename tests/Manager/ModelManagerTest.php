@@ -304,6 +304,24 @@ class ModelManagerTest extends TestCase
         $this->manager->commit($lock);
     }
 
+    public function testCommitModelEvents()
+    {
+        $model = new TestModel_1();
+
+        $this->assertFalse($model->onBeforeCommit);
+        $this->assertFalse($model->onAfterCommit);
+
+        $this->manager->persists($model);
+
+        $this->assertFalse($model->onBeforeCommit);
+        $this->assertFalse($model->onAfterCommit);
+
+        $this->manager->commit();
+
+        $this->assertTrue($model->onBeforeCommit);
+        $this->assertTrue($model->onAfterCommit);
+    }
+
     public function testFreeUpMemory()
     {
         $repo = $this->manager->getRepository(TestModel_1::class);
