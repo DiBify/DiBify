@@ -9,7 +9,7 @@ namespace DiBify\DiBify\Helpers;
 
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Mock\TestModel_1;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
 
 class IdHelperTest extends TestCase
@@ -19,7 +19,7 @@ class IdHelperTest extends TestCase
     {
         return [
             [new TestModel_1(1), '1'],
-            [Link::create('model', 2), '2'],
+            [Reference::create('model', 2), '2'],
             [new Id(3), '3'],
             [4, '4'],
             [null, null],

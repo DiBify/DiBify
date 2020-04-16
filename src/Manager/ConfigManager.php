@@ -7,7 +7,7 @@ namespace DiBify\DiBify\Manager;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
 use DiBify\DiBify\Id\IdGeneratorInterface;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Repository\Repository;
 
@@ -34,7 +34,7 @@ class ConfigManager
     }
 
     /**
-     * @param ModelInterface|Link|string $anyModelPointer
+     * @param ModelInterface|Reference|string $anyModelPointer
      * @return Repository
      * @throws InvalidArgumentException
      * @throws UnknownModelException
@@ -52,7 +52,7 @@ class ConfigManager
     }
 
     /**
-     * @param ModelInterface|Link|string $anyModelPointer
+     * @param ModelInterface|Reference|string $anyModelPointer
      * @return IdGeneratorInterface
      * @throws InvalidArgumentException
      * @throws UnknownModelException
@@ -64,7 +64,7 @@ class ConfigManager
     }
 
     /**
-     * @param ModelInterface|Link|string $anyModelPointer
+     * @param ModelInterface|Reference|string $anyModelPointer
      * @return string
      * @throws InvalidArgumentException
      * @throws UnknownModelException
@@ -75,12 +75,12 @@ class ConfigManager
             return get_class($anyModelPointer);
         }
 
-        if ($anyModelPointer instanceof Link) {
+        if ($anyModelPointer instanceof Reference) {
             $anyModelPointer = $anyModelPointer->getModelAlias();
         }
 
         if (!is_string($anyModelPointer)) {
-            throw new InvalidArgumentException('Argument should be ModelInterface, Link, model class or alias');
+            throw new InvalidArgumentException('Argument should be ModelInterface, Reference, model class or alias');
         }
 
         if (isset($this->aliasToClass[$anyModelPointer])) {

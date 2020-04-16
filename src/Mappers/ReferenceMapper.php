@@ -8,9 +8,9 @@
 namespace DiBify\DiBify\Mappers;
 
 
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 
-class LinkMapper extends ObjectMapper
+class ReferenceMapper extends ObjectMapper
 {
 
     /** @var bool */
@@ -19,7 +19,7 @@ class LinkMapper extends ObjectMapper
     public function __construct(bool $lazy = true)
     {
         $this->lazy = $lazy;
-        parent::__construct(Link::class, [
+        parent::__construct(Reference::class, [
             'id' => new IdMapper(),
             'alias' => new StringMapper()
         ]);
@@ -27,14 +27,14 @@ class LinkMapper extends ObjectMapper
 
     public function deserialize($data)
     {
-        /** @var Link $link */
-        $link = parent::deserialize($data);
+        /** @var Reference $reference */
+        $reference = parent::deserialize($data);
 
         if (!$this->lazy) {
-            Link::preload($link);
+            Reference::preload($reference);
         }
 
-        return $link;
+        return $reference;
     }
 
 }

@@ -12,7 +12,7 @@ use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\ModelManager;
 use JsonSerializable;
 
-final class Link implements JsonSerializable
+final class Reference implements JsonSerializable
 {
 
     /** @var Id */
@@ -28,7 +28,7 @@ final class Link implements JsonSerializable
     private static $preload = [];
 
     /** @var self[] */
-    private static $links = [];
+    private static $references = [];
 
     /**
      * ModelPointer constructor.
@@ -70,15 +70,15 @@ final class Link implements JsonSerializable
 
         self::preload($this);
 
-        /** @var Link[] $links */
-        $links = array_filter(self::$preload, function (Link $link) {
-            return $link->model === null;
+        /** @var Reference[] $references */
+        $references = array_filter(self::$preload, function (Reference $reference) {
+            return $reference->model === null;
         });
 
-        $assoc = ModelManager::findByLinks($links);
-        foreach ($assoc as $link => $model) {
-            /** @var Link $link */
-            $link->model = $model;
+        $assoc = ModelManager::findByReferences($references);
+        foreach ($assoc as $reference => $model) {
+            /** @var Reference $reference */
+            $reference->model = $model;
         }
 
         self::$preload = [];
@@ -116,13 +116,13 @@ final class Link implements JsonSerializable
             $hash = "{{" . spl_object_hash($id) . "}}";
 
             if (!$id->isAssigned()) {
-                if (!isset(self::$links[$alias][$hash])) {
-                    self::$links[$alias][$hash] = new self($alias, $id);
+                if (!isset(self::$references[$alias][$hash])) {
+                    self::$references[$alias][$hash] = new self($alias, $id);
                 }
             }
 
-            if (isset(self::$links[$alias][$hash])) {
-                return self::$links[$alias][$hash];
+            if (isset(self::$references[$alias][$hash])) {
+                return self::$references[$alias][$hash];
             }
 
         } else {
@@ -131,34 +131,34 @@ final class Link implements JsonSerializable
 
 
         $scalarId = (string) $id;
-        if (!isset(self::$links[$alias][$scalarId])) {
-            self::$links[$alias][$scalarId] = new self($alias, $id);
+        if (!isset(self::$references[$alias][$scalarId])) {
+            self::$references[$alias][$scalarId] = new self($alias, $id);
         }
 
-        return self::$links[$alias][$scalarId];
+        return self::$references[$alias][$scalarId];
     }
 
     public static function to(ModelInterface $model): self
     {
-        $link = self::create($model::getModelAlias(), $model->id());
-        $link->model = $model;
-        return $link;
+        $reference = self::create($model::getModelAlias(), $model->id());
+        $reference->model = $model;
+        return $reference;
     }
 
-    public static function preload(Link $link): void
+    public static function preload(Reference $reference): void
     {
-        self::$preload[] = $link;
+        self::$preload[] = $reference;
     }
 
     public static function freeUpMemory(): void
     {
         self::$preload = [];
-        self::$links = [];
+        self::$references = [];
     }
 
     /**
      * @param string $json
-     * @return Link|null
+     * @return Reference|null
      */
     public static function fromJson(string $json): ?self
     {

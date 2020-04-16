@@ -9,31 +9,31 @@ namespace DiBify\DiBify\Mappers;
 
 
 use DiBify\DiBify\Id\Id;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 
-class IdToLinkMapperTest extends MapperTestCase
+class IdToReferenceMapperTest extends MapperTestCase
 {
 
     public function serializeDataProvider(): array
     {
         return [
-            [Link::create('model', 100500), '100500'],
+            [Reference::create('model', 100500), '100500'],
         ];
     }
 
     public function serializeInvalidDataProvider(): array
     {
         return [
-            [Link::create('model', new Id())],
-            [Link::create('alias', new Id())],
+            [Reference::create('model', new Id())],
+            [Reference::create('alias', new Id())],
         ];
     }
 
     public function deserializeDataProvider(): array
     {
         return [
-            ['100500', Link::create('model', 100500)],
-            [100500, Link::create('model', 100500)],
+            ['100500', Reference::create('model', 100500)],
+            [100500, Reference::create('model', 100500)],
         ];
     }
 
@@ -47,6 +47,6 @@ class IdToLinkMapperTest extends MapperTestCase
 
     protected function getMapper(): MapperInterface
     {
-        return new IdToLinkMapper('model');
+        return new IdToReferenceMapper('model');
     }
 }

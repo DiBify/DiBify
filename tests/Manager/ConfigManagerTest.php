@@ -14,7 +14,7 @@ use DiBify\DiBify\Mock\TestModel_2_2;
 use DiBify\DiBify\Mock\TestModel_3;
 use DiBify\DiBify\Mock\TestRepo_1;
 use DiBify\DiBify\Mock\TestRepo_2;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
 
 class ConfigManagerTest extends TestCase
@@ -73,13 +73,13 @@ class ConfigManagerTest extends TestCase
             [TestModel_1::class, TestRepo_1::class, TestModel_1::class, 0],
             [TestModel_1::getModelAlias(), TestRepo_1::class, TestModel_1::class, 0],
             [new TestModel_1(), TestRepo_1::class, TestModel_1::class, 0],
-            [Link::create(TestModel_1::getModelAlias(), new Id(1)), TestRepo_1::class, TestModel_1::class, 0],
+            [Reference::create(TestModel_1::getModelAlias(), new Id(1)), TestRepo_1::class, TestModel_1::class, 0],
             [TestModel_1_1::class, TestRepo_1::class, TestModel_1_1::class, 0],
 
             [TestModel_2::class, TestRepo_2::class, TestModel_2::class, 1],
             [TestModel_2::getModelAlias(), TestRepo_2::class, TestModel_2::class, 1],
             [new TestModel_2(), TestRepo_2::class, TestModel_2::class, 1],
-            [Link::create(TestModel_2::getModelAlias(), new Id(2)), TestRepo_2::class, TestModel_2::class, 1],
+            [Reference::create(TestModel_2::getModelAlias(), new Id(2)), TestRepo_2::class, TestModel_2::class, 1],
             [TestModel_2_2::class, TestRepo_2::class, TestModel_2_2::class, 1],
         ];
     }
@@ -139,13 +139,13 @@ class ConfigManagerTest extends TestCase
             [TestModel_1::class, 1],
             [TestModel_1::getModelAlias(), 1],
             [new TestModel_1(), 1],
-            [Link::create(TestModel_1::getModelAlias(), new Id(1)), 1],
+            [Reference::create(TestModel_1::getModelAlias(), new Id(1)), 1],
             [TestModel_1_1::class, 1],
 
             [TestModel_2::class, 2],
             [TestModel_2::getModelAlias(), 2],
             [new TestModel_2(), 2],
-            [Link::create(TestModel_2::getModelAlias(), new Id(1)), 2],
+            [Reference::create(TestModel_2::getModelAlias(), new Id(1)), 2],
             [TestModel_2_2::class, 2],
         ];
     }

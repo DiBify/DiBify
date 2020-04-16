@@ -4,7 +4,7 @@ namespace DiBify\DiBify\Locker;
 
 
 use DiBify\DiBify\Mock\TestModel_1;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -80,15 +80,15 @@ class DummyLockerTest extends TestCase
 
     public function testGetLocker()
     {
-        $lockerLink = $this->dummy->getLocker($this->model_1);
-        $this->assertTrue($lockerLink->isFor($this->locker_1));
+        $lockerReference = $this->dummy->getLocker($this->model_1);
+        $this->assertTrue($lockerReference->isFor($this->locker_1));
 
-        $modelLink = Link::to($this->model_1);
-        $lockerLink = $this->dummy->getLocker($modelLink);
-        $this->assertTrue($lockerLink->isFor($this->locker_1));
+        $modelReference = Reference::to($this->model_1);
+        $lockerReference = $this->dummy->getLocker($modelReference);
+        $this->assertTrue($lockerReference->isFor($this->locker_1));
 
-        $lockerLink = $this->dummy->getLocker($this->model_3);
-        $this->assertNull($lockerLink);
+        $lockerReference = $this->dummy->getLocker($this->model_3);
+        $this->assertNull($lockerReference);
     }
 
     public function testGetDefaultTimeout()

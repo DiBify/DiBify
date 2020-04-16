@@ -11,7 +11,7 @@ use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\Commit;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
@@ -144,7 +144,7 @@ abstract class Repository
             throw new DuplicateModelException("Model with class '{$class}' and id '{$id}' already registered");
         }
 
-        Link::to($model);
+        Reference::to($model);
 
         $this->registered[$class][$id] = $model;
     }

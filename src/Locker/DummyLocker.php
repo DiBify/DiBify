@@ -5,7 +5,7 @@ namespace DiBify\DiBify\Locker;
 
 
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 
 class DummyLocker implements LockerInterface
@@ -73,26 +73,26 @@ class DummyLocker implements LockerInterface
      * @inheritDoc
      * @throws InvalidArgumentException
      */
-    public function getLocker($modelOrLink): ?Link
+    public function getLocker($modelOrReference): ?Reference
     {
-        if ($modelOrLink instanceof ModelInterface) {
-            $name = $modelOrLink::getModelAlias();
-            $id = (string) $modelOrLink->id();
+        if ($modelOrReference instanceof ModelInterface) {
+            $name = $modelOrReference::getModelAlias();
+            $id = (string) $modelOrReference->id();
         }
 
-        if ($modelOrLink instanceof Link) {
-            $name = $modelOrLink->getModelAlias();
-            $id = (string) $modelOrLink->id();
+        if ($modelOrReference instanceof Reference) {
+            $name = $modelOrReference->getModelAlias();
+            $id = (string) $modelOrReference->id();
         }
 
         if (isset($name) && isset($id)) {
             if (isset($this->locks[$name][$id])) {
-                return Link::to($this->locks[$name][$id]);
+                return Reference::to($this->locks[$name][$id]);
             }
             return null;
         }
 
-        throw new InvalidArgumentException("Locker can be resolved by model or link");
+        throw new InvalidArgumentException("Locker can be resolved by model or reference");
     }
 
     public function getDefaultTimeout(): int

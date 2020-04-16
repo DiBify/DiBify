@@ -5,7 +5,7 @@ namespace DiBify\DiBify\Locker;
 
 
 use DiBify\DiBify\Model\ModelInterface;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 
 interface LockerInterface
 {
@@ -42,10 +42,10 @@ interface LockerInterface
     public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool;
 
     /**
-     * @param ModelInterface|Link $modelOrLink
-     * @return Link|null
+     * @param ModelInterface|Reference $modelOrReference
+     * @return Reference|null
      */
-    public function getLocker($modelOrLink): ?Link;
+    public function getLocker($modelOrReference): ?Reference;
 
     /**
      * @return int

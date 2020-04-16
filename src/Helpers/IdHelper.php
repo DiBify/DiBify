@@ -5,14 +5,14 @@ namespace DiBify\DiBify\Helpers;
 
 
 use DiBify\DiBify\Id\Id;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 
 class IdHelper
 {
 
     /**
-     * @param ModelInterface|Link|Id|string|int $modelOrId
+     * @param ModelInterface|Reference|Id|string|int $modelOrId
      * @return string|null
      */
     public static function scalarizeOne($modelOrId): ?string
@@ -21,7 +21,7 @@ class IdHelper
             return (string) $modelOrId->id();
         }
 
-        if ($modelOrId instanceof Link) {
+        if ($modelOrId instanceof Reference) {
             return (string) $modelOrId->id();
         }
 
@@ -33,7 +33,7 @@ class IdHelper
     }
 
     /**
-     * @param ModelInterface[]|Link[]|Id[]|string[]|int[] $modelsOrIds
+     * @param ModelInterface[]|Reference[]|Id[]|string[]|int[] $modelsOrIds
      * @return string[]|null[]
      */
     public static function scalarizeMany(array $modelsOrIds): array

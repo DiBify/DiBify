@@ -21,7 +21,7 @@ use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Mock\TestModel_2;
 use DiBify\DiBify\Mock\TestRepo_1;
 use DiBify\DiBify\Mock\TestRepo_2;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -102,28 +102,28 @@ class ModelManagerTest extends TestCase
         );
     }
 
-    public function testFindByLink()
+    public function testFindByReference()
     {
-        $link = Link::create(TestModel_1::getModelAlias(), 2);
-        $model = $this->manager->findByLink($link);
-        $this->assertTrue($link->isFor($model));
+        $reference = Reference::create(TestModel_1::getModelAlias(), 2);
+        $model = $this->manager->findByReference($reference);
+        $this->assertTrue($reference->isFor($model));
     }
 
-    public function testFindByLinks()
+    public function testFindByReferences()
     {
-        $link_1 = Link::create(TestModel_1::getModelAlias(), 1);
-        $link_2 = Link::create(TestModel_2::getModelAlias(), 2);
+        $reference_1 = Reference::create(TestModel_1::getModelAlias(), 1);
+        $reference_2 = Reference::create(TestModel_2::getModelAlias(), 2);
 
-        $storage = $this->manager->findByLinks([$link_1, $link_2]);
-        $this->assertTrue($link_1->isFor($storage[$link_1]));
-        $this->assertTrue($link_2->isFor($storage[$link_2]));
+        $storage = $this->manager->findByReferences([$reference_1, $reference_2]);
+        $this->assertTrue($reference_1->isFor($storage[$reference_1]));
+        $this->assertTrue($reference_2->isFor($storage[$reference_2]));
     }
 
-    public function testFindByLinksWithNotLink()
+    public function testFindByReferencesWithNotReference()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1);
-        $this->manager->findByLinks([$this]);
+        $this->manager->findByReferences([$this]);
     }
 
     public function testFindByAnyTypeId()
@@ -134,8 +134,8 @@ class ModelManagerTest extends TestCase
             $this->manager->findByAnyTypeId($model)
         );
 
-        $link = Link::create(TestModel_1::getModelAlias(), 2);
-        $model = $this->manager->findByAnyTypeId($link);
+        $reference = Reference::create(TestModel_1::getModelAlias(), 2);
+        $model = $this->manager->findByAnyTypeId($reference);
         $this->assertInstanceOf(TestModel_1::class, $model);
         $this->assertEquals('2', (string) $model->id());
 

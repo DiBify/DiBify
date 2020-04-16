@@ -15,10 +15,9 @@ use DiBify\DiBify\Locker\Lock\ServiceLock;
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Locker\LockerInterface;
 use DiBify\DiBify\Model\ModelInterface;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Repository\Repository;
-use ReflectionMethod;
 use SplObjectStorage;
 use Throwable;
 
@@ -98,45 +97,45 @@ class ModelManager
     }
 
     /**
-     * @param Link $link
+     * @param Reference $reference
      * @return ModelInterface|null
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public static function findByLink(Link $link): ?ModelInterface
+    public static function findByReference(Reference $reference): ?ModelInterface
     {
         $instance = static::$instance;
-        $repo = $instance->getRepository($link->getModelAlias());
-        return $repo->findById($link->id());
+        $repo = $instance->getRepository($reference->getModelAlias());
+        return $repo->findById($reference->id());
     }
 
     /**
-     * @param Link[] $links
+     * @param Reference[] $references
      * @return SplObjectStorage
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public static function findByLinks(array $links): SplObjectStorage
+    public static function findByReferences(array $references): SplObjectStorage
     {
         $instance = static::$instance;
         $groups = [];
-        foreach ($links as $link) {
-            if (!($link instanceof Link)) {
-                throw new InvalidArgumentException("Every link should be instance of " . Link::class, 1);
+        foreach ($references as $reference) {
+            if (!($reference instanceof Reference)) {
+                throw new InvalidArgumentException("Every reference should be instance of " . Reference::class, 1);
             }
-            $alias = $link->getModelAlias();
-            $id = (string) $link->id();
-            $groups[$alias][$id] = $link;
+            $alias = $reference->getModelAlias();
+            $id = (string) $reference->id();
+            $groups[$alias][$id] = $reference;
         }
 
         $result = new SplObjectStorage();
-        foreach ($groups as $modelName => $indexedLinks) {
+        foreach ($groups as $modelName => $indexedReferences) {
             $repo = $instance->getRepository($modelName);
-            $models = $repo->findByIds(array_unique(array_keys($indexedLinks)));
+            $models = $repo->findByIds(array_unique(array_keys($indexedReferences)));
             foreach ($models as $model) {
-                foreach ($indexedLinks as $link) {
-                    if ($link->isFor($model)) {
-                        $result[$link] = $model;
+                foreach ($indexedReferences as $reference) {
+                    if ($reference->isFor($model)) {
+                        $result[$reference] = $model;
                     }
                 }
             }
@@ -145,7 +144,7 @@ class ModelManager
     }
 
     /**
-     * @param ModelInterface|Link|Id|string|int $argument
+     * @param ModelInterface|Reference|Id|string|int $argument
      * @param string|null $modelAliasOrClass
      * @return ModelInterface|null
      * @throws InvalidArgumentException
@@ -157,8 +156,8 @@ class ModelManager
             return $argument;
         }
 
-        if ($argument instanceof Link) {
-            return $this->findByLink($argument);
+        if ($argument instanceof Reference) {
+            return $this->findByReference($argument);
         }
 
         $repo = $this->getRepository($modelAliasOrClass);
@@ -288,11 +287,11 @@ class ModelManager
     }
 
     /**
-     * FreeUp all preloaded models in all repositories and all links
+     * FreeUp all preloaded models in all repositories and all references
      */
     public function freeUpMemory(): void
     {
-        Link::freeUpMemory();
+        Reference::freeUpMemory();
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }

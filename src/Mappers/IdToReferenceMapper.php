@@ -9,9 +9,9 @@ namespace DiBify\DiBify\Mappers;
 
 
 use DiBify\DiBify\Exceptions\SerializerException;
-use DiBify\DiBify\Model\Link;
+use DiBify\DiBify\Model\Reference;
 
-class IdToLinkMapper implements MapperInterface
+class IdToReferenceMapper implements MapperInterface
 {
 
     /** @var string */
@@ -31,14 +31,14 @@ class IdToLinkMapper implements MapperInterface
     }
 
     /**
-     * @param Link $complex
+     * @param Reference $complex
      * @return mixed|string
      * @throws SerializerException
      */
     public function serialize($complex)
     {
         if ($complex->getModelAlias() !== $this->alias) {
-            throw new SerializerException("Link alias should be '{$this->alias}', but '{$complex->getModelAlias()}' received");
+            throw new SerializerException("Reference alias should be '{$this->alias}', but '{$complex->getModelAlias()}' received");
         }
 
         return $this->idMapper->serialize($complex->id());
@@ -50,12 +50,12 @@ class IdToLinkMapper implements MapperInterface
     public function deserialize($data)
     {
         $id = $this->idMapper->deserialize($data);
-        $link = Link::create($this->alias, $id);
+        $reference = Reference::create($this->alias, $id);
 
         if ($this->lazy) {
-            Link::preload($link);
+            Reference::preload($reference);
         }
 
-        return $link;
+        return $reference;
     }
 }
