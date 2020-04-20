@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Replicator;
 
 
+use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
 interface ReplicatorInterface
@@ -22,9 +23,9 @@ interface ReplicatorInterface
      */
     public function getStorage(string $name = null): StorageInterface;
 
-    public function insert(string $id, array $data): void;
+    public function insert(StorageData $data): void;
 
-    public function update(string $id, array $data): void;
+    public function update(StorageData $data): void;
 
     public function delete(string $id): void;
 

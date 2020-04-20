@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Replicator;
 
 
+use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
 class DirectReplicator implements ReplicatorInterface
@@ -35,17 +36,17 @@ class DirectReplicator implements ReplicatorInterface
         return $this->storages[$name];
     }
 
-    public function insert(string $id, array $data): void
+    public function insert(StorageData $data): void
     {
         foreach ($this->storages as $storage) {
-            $storage->insert($id, $data);
+            $storage->insert($data);
         }
     }
 
-    public function update(string $id, array $data): void
+    public function update(StorageData $data): void
     {
         foreach ($this->storages as $storage) {
-            $storage->update($id, $data);
+            $storage->update($data);
         }
     }
 
