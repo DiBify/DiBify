@@ -9,6 +9,7 @@ namespace DiBify\DiBify\Mappers;
 
 
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DiBify\DiBify\Exceptions\SerializerException;
 
@@ -17,11 +18,11 @@ class DateTimeMapper implements MapperInterface
     /**
      * @var string
      */
-    private $format;
+    private $immutable;
 
-    public function __construct($format = 'Y-m-d H:i:s')
+    public function __construct($immutable = true)
     {
-        $this->format = $format;
+        $this->immutable = $immutable;
     }
 
     /**
@@ -36,7 +37,7 @@ class DateTimeMapper implements MapperInterface
             $type = gettype($complex);
             throw new SerializerException("'{$this->classname()}' expected, but '{$type}' type passed");
         }
-        return $complex->format($this->format);
+        return $complex->format('U');
     }
 
     /**
@@ -54,7 +55,7 @@ class DateTimeMapper implements MapperInterface
 
         /** @var DateTime $classname */
         $classname = $this->classname();
-        $datetime = $classname::createFromFormat($this->format, $data);
+        $datetime = new $classname("@{$data}");
         if (!$datetime) {
             throw new SerializerException("Invalid format '{$data}' for restoring '{$this->classname()}'");
         }
@@ -67,6 +68,6 @@ class DateTimeMapper implements MapperInterface
      */
     protected function classname(): string
     {
-        return DateTime::class;
+        return $this->immutable ? DateTimeImmutable::class : DateTime::class;
     }
 }
