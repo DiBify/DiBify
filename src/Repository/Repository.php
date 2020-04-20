@@ -8,14 +8,17 @@ namespace DiBify\DiBify\Repository;
 
 use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\Commit;
+use DiBify\DiBify\Mappers\ModelMapper;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
+use ReflectionException;
 
 abstract class Repository
 {
@@ -24,7 +27,7 @@ abstract class Repository
     protected $registered;
 
     /** @var ReplicatorInterface */
-    private $replicator;
+    protected $replicator;
 
     public function __construct(ReplicatorInterface $replicator)
     {
@@ -50,6 +53,10 @@ abstract class Repository
     /**
      * @param Id[]|array $ids
      * @return ModelInterface[]
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
+     * @throws ReflectionException
+     * @throws SerializerException
      */
     public function findByIds($ids): array
     {
@@ -73,27 +80,19 @@ abstract class Repository
         $this->registered = [];
     }
 
-    /**
-     * @param ModelInterface $model
-     * @return StorageData
-     */
-    abstract protected function extract(ModelInterface $model): StorageData;
-
-    /**
-     * @param StorageData $data
-     * @return ModelInterface
-     */
-    abstract protected function hydrate(StorageData $data): ModelInterface;
+    abstract protected function getMapper(): ModelMapper;
 
     /**
      * @param StorageData $data
      * @return ModelInterface
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
+     * @throws SerializerException
+     * @throws ReflectionException
      */
     protected function populateOne(StorageData $data): ModelInterface
     {
-        $model = $this->hydrate($data);
+        $model = $this->getMapper()->deserialize($data);
 
         if ($registered = $this->registered[(string) $model->id()] ?? null) {
             return $registered;
@@ -107,6 +106,10 @@ abstract class Repository
     /**
      * @param StorageData[] $array
      * @return ModelInterface[]
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
+     * @throws ReflectionException
+     * @throws SerializerException
      */
     protected function populateMany(array $array): array
     {

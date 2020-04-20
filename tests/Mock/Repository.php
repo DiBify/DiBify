@@ -4,9 +4,9 @@ namespace DiBify\DiBify\Mock;
 
 
 use DiBify\DiBify\Manager\Commit;
+use DiBify\DiBify\Mappers\ModelMapper;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\DirectReplicator;
-use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
 
 abstract class Repository extends \DiBify\DiBify\Repository\Repository
@@ -94,14 +94,9 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
         }
     }
 
-    protected function hydrate(StorageData $data): ModelInterface
+    protected function getMapper(): ModelMapper
     {
-        //Empty for mock
-    }
-
-    protected function extract(ModelInterface $model): StorageData
-    {
-        //Empty for mock
+        //Not needed for tests
     }
 
     abstract protected function getClassName(): string;
