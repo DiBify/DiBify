@@ -4,7 +4,7 @@ namespace DiBify\DiBify\Mock;
 
 
 use DiBify\DiBify\Manager\Commit;
-use DiBify\DiBify\Mappers\ModelMapper;
+use DiBify\DiBify\Mappers\MapperInterface;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\DirectReplicator;
 use Exception;
@@ -94,7 +94,7 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
         }
     }
 
-    protected function getMapper(): ModelMapper
+    protected function getMapper(): MapperInterface
     {
         //Not needed for tests
     }

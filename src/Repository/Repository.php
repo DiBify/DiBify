@@ -12,7 +12,7 @@ use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\Commit;
-use DiBify\DiBify\Mappers\ModelMapper;
+use DiBify\DiBify\Mappers\MapperInterface;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
@@ -80,7 +80,7 @@ abstract class Repository
         $this->registered = [];
     }
 
-    abstract protected function getMapper(): ModelMapper;
+    abstract protected function getMapper(): MapperInterface;
 
     /**
      * @param StorageData $data
@@ -88,7 +88,6 @@ abstract class Repository
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
      * @throws SerializerException
-     * @throws ReflectionException
      */
     protected function populateOne(StorageData $data): ModelInterface
     {
@@ -108,7 +107,6 @@ abstract class Repository
      * @return ModelInterface[]
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
-     * @throws ReflectionException
      * @throws SerializerException
      */
     protected function populateMany(array $array): array
