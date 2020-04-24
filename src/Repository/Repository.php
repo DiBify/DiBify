@@ -34,6 +34,11 @@ abstract class Repository
         $this->replicator = $replicator;
     }
 
+    public function getReplicator(): ReplicatorInterface
+    {
+        return $this->replicator;
+    }
+
     /**
      * @param Id|int|string $id
      * @param Exception|null $notFoundException
