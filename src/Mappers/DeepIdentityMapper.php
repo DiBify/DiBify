@@ -5,13 +5,12 @@
  * @author Timur Kasumov aka XAKEPEHOK
  */
 
-namespace DiBify\DiBify\Hydrator\Mappers;
+namespace DiBify\DiBify\Mappers;
 
 
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Id\Id;
-use DiBify\DiBify\Mappers\MapperInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -26,9 +25,6 @@ use ReflectionProperty;
  */
 class DeepIdentityMapper implements MapperInterface
 {
-
-    protected const IDENTITY_KEY = '___{identity}___';
-
     /**
      * @var array
      */
@@ -45,15 +41,21 @@ class DeepIdentityMapper implements MapperInterface
      * @var ReflectionClass[]
      */
     private $reflectionClasses = [];
+    /**
+     * @var string
+     */
+    private $identityKey;
 
     /**
      * DeepIdentityMapper constructor.
      * @param array $classMap
+     * @param string $identityKey
      * @param array $reflectionProperties
      * @throws InvalidArgumentException
      */
     public function __construct(
         array $classMap,
+        string $identityKey = '___identity___',
         array $reflectionProperties = [
             ReflectionProperty::IS_PUBLIC,
             ReflectionProperty::IS_PROTECTED,
@@ -77,6 +79,7 @@ class DeepIdentityMapper implements MapperInterface
         }
 
         $this->reflectionProperties =  array_reduce($reflectionProperties, function($a, $b) { return $a | $b; }, 0);
+        $this->identityKey = $identityKey;
     }
 
     /**
@@ -101,7 +104,7 @@ class DeepIdentityMapper implements MapperInterface
     protected function deserializeRecursive($data)
     {
         if (is_array($data)) {
-            if (!isset($data[static::IDENTITY_KEY])) {
+            if (!isset($data[$this->identityKey])) {
                 $array = [];
                 foreach ($data as $key => $value) {
                     $array[$key] = $this->deserializeRecursive($value);
@@ -109,11 +112,11 @@ class DeepIdentityMapper implements MapperInterface
                 return $array;
             }
 
-            if (isset($this->identityMap[$data[static::IDENTITY_KEY]])) {
-                $class = $this->identityMap[$data[static::IDENTITY_KEY]];
+            if (isset($this->identityMap[$data[$this->identityKey]])) {
+                $class = $this->identityMap[$data[$this->identityKey]];
 
                 if ($class == Id::class) {
-                    return new Id($data['data']['id']);
+                    return new Id($data['data']);
                 }
 
                 $reflection = $this->getReflectionClass($class, SerializerException::class);
@@ -130,7 +133,7 @@ class DeepIdentityMapper implements MapperInterface
                 return $object;
 
             } else {
-                throw new SerializerException("Trying to deserialize corrupted data. Invalid identity key '{$data[static::IDENTITY_KEY]}'");
+                throw new SerializerException("Trying to deserialize corrupted data. Invalid identity key '{$data[$this->identityKey]}'");
             }
         }
 
@@ -169,12 +172,12 @@ class DeepIdentityMapper implements MapperInterface
             $reflection = $this->getReflectionClass($class, SerializerException::class);
 
             $data = [
-                static::IDENTITY_KEY => $this->classMap[$class],
+                $this->identityKey => $this->classMap[$class],
                 'data' => [],
             ];
 
             if ($something instanceof Id) {
-                $data['data']['id'] = $something->get();
+                $data['data'] = $something->get();
                 return $data;
             }
 
