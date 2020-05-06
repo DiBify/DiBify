@@ -18,7 +18,6 @@ use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
-use ReflectionException;
 
 abstract class Repository
 {
@@ -60,7 +59,6 @@ abstract class Repository
      * @return ModelInterface[]
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
-     * @throws ReflectionException
      * @throws SerializerException
      */
     public function findByIds($ids): array
