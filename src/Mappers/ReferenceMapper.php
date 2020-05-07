@@ -14,11 +14,11 @@ class ReferenceMapper extends ObjectMapper
 {
 
     /** @var bool */
-    private $lazy;
+    private $eager;
 
-    public function __construct(bool $lazy = true)
+    public function __construct(bool $eager = false)
     {
-        $this->lazy = $lazy;
+        $this->eager = $eager;
         parent::__construct(Reference::class, [
             'id' => new IdMapper(),
             'alias' => new StringMapper()
@@ -30,7 +30,7 @@ class ReferenceMapper extends ObjectMapper
         /** @var Reference $reference */
         $reference = parent::deserialize($data);
 
-        if (!$this->lazy) {
+        if ($this->eager) {
             Reference::preload($reference);
         }
 
