@@ -63,7 +63,7 @@ class ModelMapper extends ObjectMapper
             throw new SerializerException("Serialized data of model {$this->classname} should be " . StorageData::class . ", but '{$type}' type passed");
         }
 
-        $data->data[$this->idProperty] = $data->id;
-        return parent::deserialize($data->data);
+        $data->body[$this->idProperty] = $data->id;
+        return parent::deserialize($data->body);
     }
 }

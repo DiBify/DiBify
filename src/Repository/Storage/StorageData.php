@@ -15,12 +15,12 @@ class StorageData
     public $id;
 
     /** @var array */
-    public $data;
+    public $body;
 
-    public function __construct(string $id, array $data)
+    public function __construct(string $id, array $body)
     {
         $this->id = $id;
-        $this->data = $data;
+        $this->body = $body;
     }
 
 }
