@@ -28,7 +28,7 @@ class DateTimeMapper implements MapperInterface
     /**
      * Convert complex data (like object) to simpe data (scalar, null, array)
      * @param DateTimeInterface $complex
-     * @return string|null
+     * @return int|null
      * @throws SerializerException
      */
     public function serialize($complex)
@@ -37,7 +37,7 @@ class DateTimeMapper implements MapperInterface
             $type = gettype($complex);
             throw new SerializerException("'{$this->classname()}' expected, but '{$type}' type passed");
         }
-        return $complex->format('U');
+        return (int) $complex->format('U');
     }
 
     /**
@@ -48,7 +48,7 @@ class DateTimeMapper implements MapperInterface
      */
     public function deserialize($data)
     {
-        if (!is_string($data)) {
+        if (!is_string($data) && !is_integer($data)) {
             $type = gettype($data);
             throw new SerializerException("'{$this->classname()}' string expected, but '{$type}' type passed");
         }

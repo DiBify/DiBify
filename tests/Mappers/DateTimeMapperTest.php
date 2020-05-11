@@ -6,9 +6,7 @@
 
 namespace DiBify\DiBify\Mappers;
 
-use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 
 class DateTimeMapperTest extends MapperTestCase
 {
@@ -16,13 +14,14 @@ class DateTimeMapperTest extends MapperTestCase
     public function serializeDataProvider(): array
     {
         return [
-            [new DateTimeImmutable("@1587420198"), "1587420198"],
+            [new DateTimeImmutable("@1587420198"), 1587420198],
         ];
     }
 
     public function serializeInvalidDataProvider(): array
     {
         return [
+            ["1587420198"],
             ['2019-10-28 01:24:15'],
             [null],
             [1],
@@ -34,6 +33,7 @@ class DateTimeMapperTest extends MapperTestCase
     {
         return [
             ['1587420198', new DateTimeImmutable("@1587420198")],
+            [1587420198, new DateTimeImmutable("@1587420198")],
         ];
     }
 
