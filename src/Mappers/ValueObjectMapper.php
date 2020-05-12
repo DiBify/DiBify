@@ -44,12 +44,20 @@ class ValueObjectMapper implements MapperInterface
             throw new SerializerException("Mapper can serialize only {$this->classname}");
         }
 
-        return $this->mapper->serialize(
-            ReflectionHelper::getProperty(
-                $complex,
-                $this->property
-            )
-        );
+        try {
+            return $this->mapper->serialize(
+                ReflectionHelper::getProperty(
+                    $complex,
+                    $this->property
+                )
+            );
+        } catch (SerializerException $exception) {
+            throw new SerializerException(
+                "ValueObject serialization of '{$this->classname}': {$exception->getMessage()}",
+                $exception->getCode(),
+                $exception
+            );
+        }
     }
 
     /**
@@ -67,11 +75,20 @@ class ValueObjectMapper implements MapperInterface
         }
 
         $object = ReflectionHelper::newWithoutConstructor($this->classname);
-        ReflectionHelper::setProperty(
-            $object,
-            $this->property,
-            $this->mapper->deserialize($data)
-        );
+
+        try {
+            ReflectionHelper::setProperty(
+                $object,
+                $this->property,
+                $this->mapper->deserialize($data)
+            );
+        } catch (SerializerException $exception) {
+            throw new SerializerException(
+                "ValueObject deserialization of '{$this->classname}': {$exception->getMessage()}",
+                $exception->getCode(),
+                $exception
+            );
+        }
 
         return $object;
     }

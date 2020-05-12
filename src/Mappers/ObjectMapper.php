@@ -46,13 +46,22 @@ class ObjectMapper implements MapperInterface
         }
 
         $data = [];
+
         foreach ($this->mappers as $property => $mapper) {
-            $data[$property] = $mapper->serialize(
-                ReflectionHelper::getProperty(
-                    $complex,
-                    $property
-                )
-            );
+            try {
+                $data[$property] = $mapper->serialize(
+                    ReflectionHelper::getProperty(
+                        $complex,
+                        $property
+                    )
+                );
+            } catch (SerializerException $exception) {
+                throw new SerializerException(
+                    "Object serialization of '{$property}': {$exception->getMessage()}",
+                    $exception->getCode(),
+                    $exception
+                );
+            }
         }
 
         return $data;
@@ -75,11 +84,19 @@ class ObjectMapper implements MapperInterface
         $object = ReflectionHelper::newWithoutConstructor($this->classname);
         foreach ($this->mappers as $property => $mapper) {
             $value = $data[$property] ?? null;
-            ReflectionHelper::setProperty(
-                $object,
-                $property,
-                $mapper->deserialize($value)
-            );
+            try {
+                ReflectionHelper::setProperty(
+                    $object,
+                    $property,
+                    $mapper->deserialize($value)
+                );
+            } catch (SerializerException $exception) {
+                throw new SerializerException(
+                    "Object deserialization of '{$property}': {$exception->getMessage()}",
+                    $exception->getCode(),
+                    $exception
+                );
+            }
         }
 
         return $object;
