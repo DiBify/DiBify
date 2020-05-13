@@ -42,7 +42,8 @@ class ObjectMapper implements MapperInterface
     public function serialize($complex)
     {
         if (!is_object($complex) || !is_a($complex, $this->classname)) {
-            throw new SerializerException("Mapper can serialize only {$this->classname}");
+            $type = is_object($complex) ? get_class($complex) : gettype($complex);
+            throw new SerializerException("Mapper can serialize only '{$this->classname}', but '{$type}' passed");
         }
 
         $data = [];

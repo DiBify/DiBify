@@ -29,7 +29,7 @@ class ModelMapper extends ObjectMapper
     public function __construct(string $classname, array $mappers, string $idProperty = 'id')
     {
         if (!in_array(ModelInterface::class, class_implements($classname), true)) {
-            throw new SerializerException("Mapper can work only " . ModelInterface::class);
+            throw new SerializerException("Mapper can work only with '" . ModelInterface::class . "', but '{$classname}' passed");
         }
 
         parent::__construct($classname, $mappers);
