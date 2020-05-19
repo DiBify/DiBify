@@ -9,9 +9,7 @@ namespace DiBify\DiBify\Manager;
 
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
-use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Id\Id;
-use DiBify\DiBify\Id\IdGeneratorInterface;
 use DiBify\DiBify\Id\UuidGenerator;
 use DiBify\DiBify\Locker\DummyLocker;
 use DiBify\DiBify\Locker\Lock\Lock;
@@ -31,17 +29,11 @@ class ModelManagerTest extends TestCase
     /** @var LockerInterface */
     private $locker;
 
-    /** @var IdGeneratorInterface */
-    private $idGenerator;
-
     /** @var TestRepo_1 */
     private $repo_1;
 
     /** @var TestRepo_2 */
     private $repo_2;
-
-    /** @var ConfigManager */
-    private $configManager;
 
     /** @var array */
     private $onEvents = [];
@@ -54,33 +46,33 @@ class ModelManagerTest extends TestCase
     {
         parent::setUp();
         $this->locker = new DummyLocker();
-        $this->idGenerator = new UuidGenerator();
+        $idGenerator = new UuidGenerator();
 
         $this->repo_1 = new TestRepo_1();
         $this->repo_2 = new TestRepo_2();
 
-        $this->configManager = new ConfigManager();
+        $configManager = new ConfigManager();
 
-        $this->configManager->add(
+        $configManager->add(
             $this->repo_1,
             [TestModel_1::class],
-            $this->idGenerator
+            $idGenerator
         );
 
-        $this->configManager->add(
+        $configManager->add(
             $this->repo_2,
             [TestModel_2::class],
-            $this->idGenerator
+            $idGenerator
         );
 
         $this->onEvents = [];
 
         $this->manager = new ModelManager(
-            $this->configManager,
+            $configManager,
             $this->locker,
-            function (Commit $commit) {$this->onEvents['before'] = $commit;},
-            function (Commit $commit) {$this->onEvents['after'] = $commit;},
-            function (Commit $commit) {$this->onEvents['exception'] = $commit;}
+            function (Transaction $commit) {$this->onEvents['before'] = $commit;},
+            function (Transaction $commit) {$this->onEvents['after'] = $commit;},
+            function (Transaction $commit) {$this->onEvents['exception'] = $commit;}
         );
     }
 
@@ -150,55 +142,6 @@ class ModelManagerTest extends TestCase
         $this->assertEquals('3', (string) $model->id());
     }
 
-    public function testPersists()
-    {
-        $model_1 = new TestModel_1(1);
-        $model_2 = new TestModel_2(2);
-
-        $this->assertFalse($this->manager->isPersisted($model_1));
-        $this->assertFalse($this->manager->isPersisted($model_2));
-
-        $this->manager->persists($model_1);
-        $this->manager->persists([$model_2]);
-
-        $this->assertTrue($this->manager->isPersisted($model_1));
-        $this->assertTrue($this->manager->isPersisted($model_2));
-
-        $this->manager->resetPersisted();
-        $this->assertFalse($this->manager->isPersisted($model_1));
-        $this->assertFalse($this->manager->isPersisted($model_2));
-    }
-
-    public function testPersistsNotModelException()
-    {
-        $this->expectException(NotModelInterfaceException::class);
-        $this->manager->persists($this);
-    }
-
-    public function testDelete()
-    {
-        $model_1 = new TestModel_1(1);
-        $model_2 = new TestModel_2(2);
-
-        $this->assertFalse($this->manager->isDeleted($model_1));
-        $this->assertFalse($this->manager->isDeleted($model_2));
-
-        $this->manager->delete($model_1);
-        $this->manager->delete([$model_2]);
-
-        $this->assertTrue($this->manager->isDeleted($model_1));
-        $this->assertTrue($this->manager->isDeleted($model_2));
-
-        $this->manager->resetDeleted();
-        $this->assertFalse($this->manager->isDeleted($model_1));
-        $this->assertFalse($this->manager->isDeleted($model_2));
-    }
-
-    public function testDeleteNotModelException()
-    {
-        $this->expectException(NotModelInterfaceException::class);
-        $this->manager->delete($this);
-    }
 
     public function testCommitWithServiceUnlock()
     {
@@ -209,14 +152,16 @@ class ModelManagerTest extends TestCase
         $model_2 = new TestModel_2();
         $model_3 = $this->repo_1->findById(3);
 
-        $this->manager->persists([$model_1, $model_2]);
-        $this->manager->delete([$model_3]);
-        $commit = $this->manager->commit($lock);
+        $transaction = new Transaction();
+        $transaction->persists([$model_1, $model_2]);
+        $transaction->delete([$model_3]);
 
-        $this->assertInstanceOf(Commit::class, $commit);
-        $this->assertContains($model_1, $commit->getPersisted(TestModel_1::class));
-        $this->assertContains($model_2, $commit->getPersisted(TestModel_2::class));
-        $this->assertContains($model_3, $commit->getDeleted(TestModel_1::class));
+        $this->manager->commit($transaction, $lock);
+
+        $this->assertInstanceOf(Transaction::class, $transaction);
+        $this->assertContains($model_1, $transaction->getPersisted(TestModel_1::class));
+        $this->assertContains($model_2, $transaction->getPersisted(TestModel_2::class));
+        $this->assertContains($model_3, $transaction->getDeleted(TestModel_1::class));
 
         $this->assertTrue($model_1->id()->isAssigned());
         $this->assertTrue($model_2->id()->isAssigned());
@@ -230,8 +175,8 @@ class ModelManagerTest extends TestCase
         $this->assertNull($locker->getLocker($model_2));
         $this->assertNull($locker->getLocker($model_3));
 
-        $this->assertSame($commit, $this->onEvents['before'] ?? null);
-        $this->assertSame($commit, $this->onEvents['after'] ?? null);
+        $this->assertSame($transaction, $this->onEvents['before'] ?? null);
+        $this->assertSame($transaction, $this->onEvents['after'] ?? null);
         $this->assertArrayNotHasKey('exception', $this->onEvents);
     }
 
@@ -241,10 +186,8 @@ class ModelManagerTest extends TestCase
         $lock = new ServiceLock($lockedBy, 3);
 
         $model = new TestModel_1('exception');
-
         try {
-            $this->manager->persists($model);
-            $this->manager->commit($lock);
+            $this->manager->commit(new Transaction([$model]), $lock);
         } catch (Throwable $throwable) {
             $this->assertInstanceOf(Throwable::class, $throwable);
         }
@@ -252,8 +195,8 @@ class ModelManagerTest extends TestCase
         $locker = $this->manager->getLocker();
         $this->assertNull($locker->getLocker($model));
 
-        $this->assertInstanceOf(Commit::class, $this->onEvents['before'] ?? null);
-        $this->assertInstanceOf(Commit::class, $this->onEvents['exception'] ?? null);
+        $this->assertInstanceOf(Transaction::class, $this->onEvents['before'] ?? null);
+        $this->assertInstanceOf(Transaction::class, $this->onEvents['exception'] ?? null);
         $this->assertArrayNotHasKey('after', $this->onEvents);
     }
 
@@ -263,9 +206,7 @@ class ModelManagerTest extends TestCase
         $lock = new Lock($lockedBy, 2);
 
         $model = new TestModel_1();
-
-        $this->manager->persists([$model]);
-        $this->manager->commit($lock);
+        $this->manager->commit(new Transaction([$model]), $lock);
 
         $locker = $this->manager->getLocker();
         $this->assertTrue($locker->getLocker($model)->isFor($lockedBy));
@@ -279,8 +220,7 @@ class ModelManagerTest extends TestCase
         $model = new TestModel_1('exception');
 
         try {
-            $this->manager->persists($model);
-            $this->manager->commit($lock);
+            $this->manager->commit(new Transaction([$model]), $lock);
         } catch (Throwable $throwable) {
             $this->assertInstanceOf(Throwable::class, $throwable);
         }
@@ -295,13 +235,11 @@ class ModelManagerTest extends TestCase
 
         $lockedBy = new TestModel_1(1);
         $lock = new Lock($lockedBy, 2);
-
         $model = new TestModel_2(2);
-        $this->manager->persists($model);
 
         $this->manager->getLocker()->lock($model, new TestModel_1(11));
 
-        $this->manager->commit($lock);
+        $this->manager->commit(new Transaction([$model]), $lock);
     }
 
     public function testCommitModelEvents()
@@ -311,12 +249,13 @@ class ModelManagerTest extends TestCase
         $this->assertFalse($model->onBeforeCommit);
         $this->assertFalse($model->onAfterCommit);
 
-        $this->manager->persists($model);
+        $transaction = new Transaction();
+        $transaction->persists([$model]);
 
         $this->assertFalse($model->onBeforeCommit);
         $this->assertFalse($model->onAfterCommit);
 
-        $this->manager->commit();
+        $this->manager->commit($transaction);
 
         $this->assertTrue($model->onBeforeCommit);
         $this->assertTrue($model->onAfterCommit);

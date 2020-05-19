@@ -24,14 +24,6 @@ use Throwable;
 class ModelManager
 {
     /**
-     * @var ModelInterface[]
-     */
-    protected $persisted = [];
-    /**
-     * @var ModelInterface[]
-     */
-    protected $deleted = [];
-    /**
      * @var ConfigManager
      */
     private $configManager;
@@ -165,105 +157,42 @@ class ModelManager
     }
 
     /**
-     * Prepare model to store it in DB
-     * @param ModelInterface|ModelInterface[] $models
-     * @throws NotModelInterfaceException
-     */
-    public function persists($models = []): void
-    {
-        if (!is_array($models)) {
-            $models = func_get_args();
-        }
-
-        foreach ($models as $model) {
-            $this->guardNotModelInterface($model);
-            $hash = spl_object_hash($model);
-            $this->persisted[$hash] = $model;
-            unset($this->deleted[$hash]);
-        }
-    }
-
-    public function isPersisted(ModelInterface $model): bool
-    {
-        $hash = spl_object_hash($model);
-        return isset($this->persisted[$hash]);
-    }
-
-    public function resetPersisted(): void
-    {
-        $this->persisted = [];
-    }
-
-    /**
-     * Prepare models for delete it from DB
-     * @param ModelInterface|ModelInterface[] $models
-     * @throws NotModelInterfaceException
-     */
-    public function delete($models = []): void
-    {
-        if (!is_array($models)) {
-            $models = func_get_args();
-        }
-
-        foreach ($models as $model) {
-            $this->guardNotModelInterface($model);
-            $hash = spl_object_hash($model);
-            $this->deleted[$hash] = $model;
-            unset($this->persisted[$hash]);
-        }
-    }
-
-    public function isDeleted(ModelInterface $model): bool
-    {
-        $hash = spl_object_hash($model);
-        return isset($this->deleted[$hash]);
-    }
-
-    public function resetDeleted(): void
-    {
-        $this->deleted = [];
-    }
-
-    /**
+     * @param Transaction $transaction
      * @param Lock $lock
-     * @return Commit
      * @throws InvalidArgumentException
-     * @throws NotModelInterfaceException
      * @throws Throwable
      * @throws UnknownModelException
      */
-    public function commit(Lock $lock = null): Commit
+    public function commit(Transaction $transaction, Lock $lock = null): void
     {
-        $commit = new Commit($this->persisted, $this->deleted);
-
         //Assigns real ids
-        foreach ($commit->getPersisted() as $model) {
+        foreach ($transaction->getPersisted() as $model) {
             $idGenerator = $this->configManager->getIdGenerator($model);
             $idGenerator($model);
         }
 
         //onBeforeCommit
-        foreach ($commit->getPersisted() as $model) {
+        foreach ($transaction->getPersisted() as $model) {
             if (method_exists($model, 'onBeforeCommit')) {
                 $this->runModelEvent($model, 'onBeforeCommit');
             }
         }
 
-        ($this->onBeforeCommit)($commit);
-        $models = array_merge($commit->getPersisted(), $commit->getDeleted());
+        ($this->onBeforeCommit)($transaction);
+        $models = array_merge($transaction->getPersisted(), $transaction->getDeleted());
 
         try {
             $this->lock($models, $lock);
 
             $modelClasses = array_unique(array_map('get_class',$models));
             foreach ($modelClasses as $modelClass) {
-                $this->getRepository($modelClass)->commit($commit);
+                $this->getRepository($modelClass)->commit($transaction);
             }
 
-            ($this->onAfterCommit)($commit);
+            ($this->onAfterCommit)($transaction);
 
             //onAfterCommit
-            foreach ($commit->getPersisted() as $model) {
+            foreach ($transaction->getPersisted() as $model) {
                 if (method_exists($model, 'onAfterCommit')) {
                     $this->runModelEvent($model, 'onAfterCommit');
                 }
@@ -279,11 +208,9 @@ class ModelManager
                 $this->unlock($models, $lock);
             }
 
-            ($this->onCommitException)($commit);
+            ($this->onCommitException)($transaction);
             throw $exception;
         }
-
-        return $commit;
     }
 
     /**
@@ -332,17 +259,6 @@ class ModelManager
             foreach ($models as $model) {
                 $this->getLocker()->unlock($model, $lock->getLocker());
             }
-        }
-    }
-
-    /**
-     * @param $model
-     * @throws NotModelInterfaceException
-     */
-    private function guardNotModelInterface($model): void
-    {
-        if (!$model instanceof ModelInterface) {
-            throw new NotModelInterfaceException($model);
         }
     }
 

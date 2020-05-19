@@ -11,7 +11,7 @@ use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Id\Id;
-use DiBify\DiBify\Manager\Commit;
+use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Mappers\MapperInterface;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
@@ -69,9 +69,9 @@ abstract class Repository
     }
 
     /**
-     * @param Commit $commit
+     * @param Transaction $transaction
      */
-    abstract public function commit(Commit $commit): void;
+    abstract public function commit(Transaction $transaction): void;
 
     /**
      * Освобождает из памяти загруженные модели.

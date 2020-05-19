@@ -3,7 +3,7 @@
 namespace DiBify\DiBify\Mock;
 
 
-use DiBify\DiBify\Manager\Commit;
+use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Mappers\MapperInterface;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\DirectReplicator;
@@ -61,16 +61,16 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
     /**
      * @inheritDoc
      */
-    public function commit(Commit $commit): void
+    public function commit(Transaction $transaction): void
     {
-        $persistedModels = $commit->getPersisted($this->getClassName());
+        $persistedModels = $transaction->getPersisted($this->getClassName());
         foreach ($persistedModels as $model) {
             $this->modelException($model);
             $this->models[(string) $model->id()] = $model;
             $this->register($model);
         }
 
-        $deletedModels = $commit->getDeleted($this->getClassName());
+        $deletedModels = $transaction->getDeleted($this->getClassName());
         foreach ($deletedModels as $model) {
             $this->modelException($model);
             unset($this->models[(string) $model->id()]);
