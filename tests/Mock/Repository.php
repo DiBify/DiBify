@@ -17,7 +17,7 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
 
     public function __construct()
     {
-        parent::__construct(new DirectReplicator([]));
+        parent::__construct(new TestReplicator());
         $class = $this->getClassName();
         $this->models = [
             '1' => new $class(1),

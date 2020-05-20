@@ -14,14 +14,24 @@ use DiBify\DiBify\Repository\Storage\StorageInterface;
 interface ReplicatorInterface
 {
 
-    public function __construct(array $storages);
+    public function __construct(StorageInterface $primary, array $slaves);
 
     /**
-     * Should return storage by name or return primary storage if name is null
-     * @param string|null $name
+     * Should return primary storage
      * @return StorageInterface
      */
-    public function getStorage(string $name = null): StorageInterface;
+    public function getPrimary(): StorageInterface;
+
+    /**
+     * @param string $name
+     * @return StorageInterface
+     */
+    public function getSlaveByName(string $name): StorageInterface;
+
+    /**
+     * @return StorageInterface[]
+     */
+    public function getSlaves(): array;
 
     public function insert(StorageData $data): void;
 

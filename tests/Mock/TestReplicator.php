@@ -1,26 +1,30 @@
 <?php
 /**
- * Created for DiBify
- * Date: 08.03.2020
+ * Created for LeadVertex
+ * Date: 21.05.2020
  * @author Timur Kasumov (XAKEPEHOK)
  */
 
-namespace DiBify\DiBify\Replicator;
+namespace DiBify\DiBify\Mock;
 
 
+use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
-class DirectReplicator implements ReplicatorInterface
+class TestReplicator implements ReplicatorInterface
 {
 
-    /** @var StorageInterface */
+    /**
+     * @var StorageInterface|null
+     */
     private $primary;
-
-    /** @var StorageInterface[] */
+    /**
+     * @var array
+     */
     private $slaves;
 
-    public function __construct(StorageInterface $primary, array $slaves)
+    public function __construct(StorageInterface $primary = null, array $slaves = [])
     {
         $this->primary = $primary;
         $this->slaves = $slaves;
@@ -31,12 +35,9 @@ class DirectReplicator implements ReplicatorInterface
         return $this->primary;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getSlaveByName(string $name): StorageInterface
     {
-        return $this->slaves[$name];
+        return $this->primary;
     }
 
     public function getSlaves(): array
@@ -46,25 +47,16 @@ class DirectReplicator implements ReplicatorInterface
 
     public function insert(StorageData $data): void
     {
-        $this->primary->insert($data);
-        foreach ($this->slaves as $slave) {
-            $slave->insert($data);
-        }
+        return;
     }
 
     public function update(StorageData $data): void
     {
-        $this->primary->update($data);
-        foreach ($this->slaves as $slave) {
-            $slave->update($data);
-        }
+        return;
     }
 
     public function delete(string $id): void
     {
-        $this->primary->delete($id);
-        foreach ($this->slaves as $slave) {
-            $slave->delete($id);
-        }
+        return;
     }
 }
