@@ -49,7 +49,10 @@ abstract class Repository
         $storage = $this->replicator->getStorage();
         $data = $storage->findById((string) $id);
         if (is_null($data)) {
-            throw $notFoundException;
+            if ($notFoundException) {
+                throw $notFoundException;
+            }
+            return null;
         }
         return $this->populateOne($data);
     }
