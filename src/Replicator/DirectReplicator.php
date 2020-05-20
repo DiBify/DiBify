@@ -20,7 +20,7 @@ class DirectReplicator implements ReplicatorInterface
     /** @var StorageInterface[] */
     private $slaves;
 
-    public function __construct(StorageInterface $primary, array $slaves)
+    public function __construct(StorageInterface $primary, array $slaves = [])
     {
         $this->primary = $primary;
         $this->slaves = $slaves;

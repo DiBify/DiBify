@@ -14,7 +14,7 @@ use DiBify\DiBify\Repository\Storage\StorageInterface;
 interface ReplicatorInterface
 {
 
-    public function __construct(StorageInterface $primary, array $slaves);
+    public function __construct(StorageInterface $primary, array $slaves = []);
 
     /**
      * Should return primary storage
