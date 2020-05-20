@@ -46,7 +46,7 @@ abstract class Repository
      */
     public function findById($id, Exception $notFoundException = null): ?ModelInterface
     {
-        $storage = $this->replicator->getStorage();
+        $storage = $this->replicator->getPrimary();
         $data = $storage->findById((string) $id);
         if (is_null($data)) {
             if ($notFoundException) {
@@ -66,7 +66,7 @@ abstract class Repository
      */
     public function findByIds($ids): array
     {
-        $storage = $this->replicator->getStorage();
+        $storage = $this->replicator->getPrimary();
         $array = $storage->findByIds(IdHelper::scalarizeMany($ids));
         return $this->populateMany($array);
     }
