@@ -75,10 +75,10 @@ final class Reference implements JsonSerializable
             return $reference->model === null;
         });
 
-        $assoc = ModelManager::findByReferences($references);
-        foreach ($assoc as $reference => $model) {
+        $objectStorage = ModelManager::findByReferences($references);
+        foreach ($objectStorage as $reference) {
             /** @var Reference $reference */
-            $reference->model = $model;
+            $reference->model = $objectStorage[$reference];
         }
 
         self::$preload = [];
