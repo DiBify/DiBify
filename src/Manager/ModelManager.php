@@ -121,8 +121,8 @@ class ModelManager
         }
 
         $result = new SplObjectStorage();
-        foreach ($groups as $modelName => $indexedReferences) {
-            $repo = $instance->getRepository($modelName);
+        foreach ($groups as $alias => $indexedReferences) {
+            $repo = $instance->getRepository($alias);
             $models = $repo->findByIds(array_unique(array_keys($indexedReferences)));
             foreach ($models as $model) {
                 foreach ($indexedReferences as $reference) {
