@@ -99,8 +99,8 @@ abstract class Repository
     {
         $model = $this->getMapper()->deserialize($data);
 
-        if ($registered = $this->registered[(string) $model->id()] ?? null) {
-            return $registered;
+        if ($this->isRegistered($model)) {
+            return $this->registered[get_class($model)][(string) $model->id()];
         }
 
         $this->register($model);
