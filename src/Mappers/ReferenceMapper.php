@@ -27,8 +27,7 @@ class ReferenceMapper extends ObjectMapper
 
     public function deserialize($data)
     {
-        /** @var Reference $reference */
-        $reference = parent::deserialize($data);
+        $reference = Reference::create($data['alias'], $data['id']);
 
         if ($this->eager) {
             Reference::preload($reference);
