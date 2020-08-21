@@ -49,9 +49,9 @@ class ReferenceMapperTest extends MapperTestCase
         return [
             ['id' => '1'],
             ['alias' => 'model'],
-            ['id' => '1', 'model' => null],
-            ['id' => null, 'model' => 'model'],
-            ['id' => null, 'model' => null],
+            ['id' => '1', 'alias' => null],
+            ['id' => null, 'alias' => 'model'],
+            ['id' => null, 'alias' => null],
             [1],
             ['string'],
             [null],

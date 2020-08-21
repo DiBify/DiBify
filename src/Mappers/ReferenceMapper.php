@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Mappers;
 
 
+use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Model\Reference;
 
 class ReferenceMapper extends ObjectMapper
@@ -27,6 +28,10 @@ class ReferenceMapper extends ObjectMapper
 
     public function deserialize($data)
     {
+        if (!is_array($data) || !isset($data['alias']) || !isset($data['id'])) {
+            throw new SerializerException("Serialized data of Reference are invalid");
+        }
+
         $reference = Reference::create($data['alias'], $data['id']);
 
         if ($this->eager) {
