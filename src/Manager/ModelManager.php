@@ -16,7 +16,6 @@ use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Locker\LockerInterface;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Model\Reference;
-use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Repository\Repository;
 use SplObjectStorage;
 use Throwable;
@@ -233,7 +232,7 @@ class ModelManager
 
     /**
      * @param ModelInterface[] $models
-     * @param Lock $lock
+     * @param Lock|null $lock
      * @throws LockedModelException
      */
     protected function lock(array $models, ?Lock $lock): void
@@ -241,7 +240,7 @@ class ModelManager
         if ($lock) {
             foreach ($models as $model) {
                 if ($this->getLocker()->isLockedFor($model, $lock->getLocker())) {
-                    throw new LockedModelException();
+                    throw new LockedModelException('Model locked by somebody else');
                 }
 
                 $this->getLocker()->lock($model, $lock->getLocker(), $lock->getTimeout());
