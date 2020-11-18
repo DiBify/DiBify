@@ -14,6 +14,8 @@ use DiBify\DiBify\Id\Id;
 class IdMapper implements MapperInterface
 {
 
+    use SharedMapperTrait;
+
     /**
      * @param Id $complex
      * @return mixed

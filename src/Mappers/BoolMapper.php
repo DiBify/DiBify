@@ -13,6 +13,8 @@ use DiBify\DiBify\Exceptions\SerializerException;
 class BoolMapper implements MapperInterface
 {
 
+    use SharedMapperTrait;
+
     /**
      * Convert complex data (like object) to simpe data (scalar, null, array)
      * @param $complex
