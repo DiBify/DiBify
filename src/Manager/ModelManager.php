@@ -238,12 +238,16 @@ class ModelManager
     protected function lock(array $models, ?Lock $lock): void
     {
         if ($lock) {
+            $locker = $this->getLocker();
             foreach ($models as $model) {
-                if ($this->getLocker()->isLockedFor($model, $lock->getLocker())) {
+
+                if ($locker->isLockedFor($model, $lock->getLocker())) {
                     throw new LockedModelException('Model locked by somebody else');
                 }
 
-                $this->getLocker()->lock($model, $lock->getLocker(), $lock->getTimeout());
+                if ($locker->getLocker($model) === null) {
+                    $locker->lock($model, $lock->getLocker(), $lock->getTimeout());
+                }
             }
         }
     }
