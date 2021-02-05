@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Model;
 
 
+use DiBify\DiBify\Exceptions\ReferenceDataException;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\ModelManager;
 use JsonSerializable;
@@ -157,15 +158,31 @@ final class Reference implements JsonSerializable
     }
 
     /**
+     * @param array|null $data
+     * @return Reference|null
+     * @throws ReferenceDataException
+     */
+    public static function fromArray(?array $data): ?self
+    {
+        if (is_null($data)) {
+            return null;
+        }
+
+        if (is_array($data) && isset($data['alias']) && isset($data['id'])) {
+            return self::create($data['alias'], $data['id']);
+        }
+
+        throw new ReferenceDataException('Invalid data passed for reference construction', 1);
+    }
+
+    /**
      * @param string $json
      * @return Reference|null
+     * @throws ReferenceDataException
      */
     public static function fromJson(string $json): ?self
     {
         $data = json_decode($json, true);
-        if (is_array($data) && isset($data['alias']) && isset($data['id'])) {
-            return self::create($data['alias'], $data['id']);
-        }
-        return null;
+        return self::fromArray($data);
     }
 }
