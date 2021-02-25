@@ -166,4 +166,11 @@ class TransactionTest extends TestCase
         $this->assertEmpty($this->transaction->getDeleted());
     }
 
+    public function testGetSetMetadata()
+    {
+        $this->assertNull($this->transaction->getMetadata('key'));
+        $this->transaction->setMetadata('key', 'hello world');
+        $this->assertSame('hello world', $this->transaction->getMetadata('key'));
+    }
+
 }

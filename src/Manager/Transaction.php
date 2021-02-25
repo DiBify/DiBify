@@ -22,6 +22,9 @@ class Transaction
     /** @var ModelInterface[] */
     protected $deleted = [];
 
+    /** @var array */
+    protected $metadata = [];
+
     /**
      * Commit constructor.
      * @param ModelInterface[] $persisted
@@ -131,6 +134,16 @@ class Transaction
     public function resetDeleted(): void
     {
         $this->deleted = [];
+    }
+
+    public function getMetadata(string $key)
+    {
+        return $this->metadata[$key] ?? null;
+    }
+
+    public function setMetadata(string $key, $value)
+    {
+        return $this->metadata[$key] = $value;
     }
 
     /**
