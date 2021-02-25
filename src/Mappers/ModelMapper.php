@@ -64,6 +64,8 @@ class ModelMapper extends ObjectMapper
         }
 
         $data->body[$this->idProperty] = $data->id;
-        return parent::deserialize($data->body);
+        $model = parent::deserialize($data->body);
+        unset($data->body[$this->idProperty]);
+        return $model;
     }
 }
