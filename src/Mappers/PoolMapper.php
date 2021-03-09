@@ -52,6 +52,14 @@ class PoolMapper implements MapperInterface
      */
     public function deserialize($data)
     {
+        if (is_array($data)) {
+            if (isset($data['current']) && isset($data['pool'])) {
+                $data = $data['current'];
+            } else {
+                throw new SerializerException("Pool expected, but array passed");
+            }
+        }
+
         $current = $this->mapper->deserialize($data);
 
         $class = $this->poolClass;

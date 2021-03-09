@@ -34,6 +34,7 @@ class PoolMapperTest extends MapperTestCase
         return [
             [100.1, new FloatPool(100.1)],
             [0.0, new FloatPool(0.0)],
+            [['current' => 100.1, 'pool' => 0.0], new FloatPool(100.1)],
         ];
     }
 
@@ -41,6 +42,8 @@ class PoolMapperTest extends MapperTestCase
     {
         return [
             ['hello'],
+            [['current' => 100.1]],
+            [['pool' => 0.0]],
         ];
     }
 
