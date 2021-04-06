@@ -10,6 +10,7 @@ use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Helpers\IdHelper;
+use DiBify\DiBify\Helpers\ModelHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Mappers\MapperInterface;
@@ -18,6 +19,7 @@ use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use Exception;
+use SplObjectStorage;
 
 abstract class Repository
 {
@@ -72,14 +74,70 @@ abstract class Repository
     }
 
     /**
-     * @param Transaction $transaction
+     * @param ModelInterface[] $models
+     * @return SplObjectStorage
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
      */
-    abstract public function commit(Transaction $transaction): void;
+    public function refresh($models): SplObjectStorage
+    {
+        $map = new SplObjectStorage();
+        $models = ModelHelper::indexById($models);
+        $storage = $this->replicator->getPrimary();
+        $storageDataArray = $storage->findByIds(array_keys($models));
+        foreach ($storageDataArray as $id => $storageData) {
+            $model = $models[$id];
+            unset($models[$id]);
+            $refreshed = $this->getMapper()->deserialize($storageData);
+
+            $modelHash = md5(var_export($model, true));
+            $refreshedHash = md5(var_export($refreshed, true));
+
+            if ($modelHash === $refreshedHash) {
+                $map[$model] = $model;
+            } else {
+                $map[$model] = $refreshed;
+                $this->register($model, true);
+            }
+        }
+
+        foreach ($models as $id => $model) {
+            $map[$model] = null;
+        }
+
+        return $map;
+    }
 
     /**
-     * Освобождает из памяти загруженные модели.
-     * ВНИМАНИЕ: после освобождения памяти в случае сохранения существующей модели через self::save()
-     * в БД будет вставлена новая запись вместо обновления существующей
+     * @param Transaction $transaction
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
+     */
+    public function commit(Transaction $transaction): void
+    {
+        foreach ($this->classes() as $class) {
+            foreach ($transaction->getPersisted($class) as $model) {
+                $data = $this->getMapper()->serialize($model);
+                if ($this->isRegistered($model)) {
+                    $this->replicator->update($data);
+                } else {
+                    $this->replicator->insert($data);
+                    $this->register($model);
+                }
+            }
+
+            foreach ($transaction->getDeleted($class) as $model) {
+                $this->replicator->delete((string) $model->id());
+                $this->unregister($model);
+            }
+        }
+    }
+
+    /**
+     * Free-up model from memory. Warning! After calling this method, existed models in commit may be attempting insert
+     * instead of update
      */
     public function freeUpMemory(): void
     {
@@ -87,6 +145,8 @@ abstract class Repository
     }
 
     abstract protected function getMapper(): MapperInterface;
+
+    abstract public function classes(): array;
 
     /**
      * @param StorageData $data
@@ -135,10 +195,11 @@ abstract class Repository
 
     /**
      * @param ModelInterface $model
+     * @param bool $refresh
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
      */
-    protected function register(ModelInterface $model): void
+    protected function register(ModelInterface $model, $refresh = false): void
     {
         if (!$model->id()->isAssigned()) {
             throw new NotPermanentIdException('Model without permanent id can not be registered');
@@ -147,7 +208,7 @@ abstract class Repository
         $class = get_class($model);
         $id = (string) $model->id();
 
-        if (isset($this->registered[$class][$id]) && $this->registered[$class][$id] !== $model) {
+        if (isset($this->registered[$class][$id]) && $this->registered[$class][$id] !== $model && $refresh === false) {
             throw new DuplicateModelException("Model with class '{$class}' and id '{$id}' already registered");
         }
 

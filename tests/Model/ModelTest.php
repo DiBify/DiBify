@@ -18,9 +18,8 @@ class ModelTest extends TestCase
     {
         $model = new TestModel_1();
         self::assertInstanceOf(Id::class, $model->id());
-        self::assertInstanceOf(Id::class, $model->getOtherId());
+        self::assertNull($model->getOtherId());
         self::assertFalse($model->id()->isAssigned());
-        self::assertFalse($model->getOtherId()->isAssigned());
         return $model;
     }
 

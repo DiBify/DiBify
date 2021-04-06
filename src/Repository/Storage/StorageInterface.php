@@ -19,7 +19,7 @@ interface StorageInterface
 
     /**
      * @param string[] $ids
-     * @return StorageData[]
+     * @return StorageData[] indexed by id
      */
     public function findByIds($ids): array;
 

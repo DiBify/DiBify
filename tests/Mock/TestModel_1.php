@@ -23,7 +23,7 @@ class TestModel_1 implements ModelInterface
     public function __construct($id = null, $otherId = null, $custom = null)
     {
         $this->id = new Id($id);
-        $this->otherId = new Id($otherId);
+        $this->otherId = $otherId ? new Id($otherId) : null;
         $this->custom = $custom;
     }
 

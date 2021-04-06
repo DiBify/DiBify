@@ -4,21 +4,24 @@ namespace DiBify\DiBify\Mock;
 
 
 use DiBify\DiBify\Manager\Transaction;
+use DiBify\DiBify\Mappers\IdMapper;
 use DiBify\DiBify\Mappers\MapperInterface;
+use DiBify\DiBify\Mappers\ModelMapper;
+use DiBify\DiBify\Mappers\NullOrMapper;
+use DiBify\DiBify\Mappers\StringMapper;
 use DiBify\DiBify\Model\ModelInterface;
-use DiBify\DiBify\Replicator\DirectReplicator;
 use Exception;
 
 abstract class Repository extends \DiBify\DiBify\Repository\Repository
 {
 
     /** @var ModelInterface */
-    private $models;
+    public $models;
 
     public function __construct()
     {
         parent::__construct(new TestReplicator());
-        $class = $this->getClassName();
+        $class = current($this->classes());
         $this->models = [
             '1' => new $class(1),
             '2' => new $class(2),
@@ -58,29 +61,25 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
         return $models;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function commit(Transaction $transaction): void
-    {
-        $persistedModels = $transaction->getPersisted($this->getClassName());
-        foreach ($persistedModels as $model) {
-            $this->modelException($model);
-            $this->models[(string) $model->id()] = $model;
-            $this->register($model);
-        }
-
-        $deletedModels = $transaction->getDeleted($this->getClassName());
-        foreach ($deletedModels as $model) {
-            $this->modelException($model);
-            unset($this->models[(string) $model->id()]);
-            $this->unregister($model);
-        }
-    }
-
     public function getRegistered(): array
     {
         return $this->registered;
+    }
+
+    public function commit(Transaction $transaction): void
+    {
+        parent::commit($transaction);
+        foreach ($this->classes() as $class) {
+            foreach ($transaction->getPersisted($class) as $model) {
+                $this->modelException($model);
+                $this->models[(string) $model->id()] = $model;
+            }
+
+            foreach ($transaction->getDeleted($class) as $model) {
+                $this->modelException($model);
+                unset($this->models[(string) $model->id()]);
+            }
+        }
     }
 
     /**
@@ -96,9 +95,12 @@ abstract class Repository extends \DiBify\DiBify\Repository\Repository
 
     protected function getMapper(): MapperInterface
     {
-        //Not needed for tests
+        $class = current($this->classes());
+        return new ModelMapper($class, [
+            'id' => IdMapper::getInstance(),
+            'otherId' => new NullOrMapper(IdMapper::getInstance()),
+            'custom' => new NullOrMapper(StringMapper::getInstance()),
+        ]);
     }
-
-    abstract protected function getClassName(): string;
 
 }

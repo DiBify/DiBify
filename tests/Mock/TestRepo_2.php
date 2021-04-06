@@ -7,8 +7,8 @@ namespace DiBify\DiBify\Mock;
 class TestRepo_2 extends Repository
 {
 
-    protected function getClassName(): string
+    public function classes(): array
     {
-        return TestModel_2::class;
+        return [TestModel_2::class];
     }
 }
