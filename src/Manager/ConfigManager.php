@@ -15,13 +15,12 @@ class ConfigManager
 {
 
     /** @var Repository[]|callable[] */
-    protected $classToRepo;
+    protected array $classToRepo;
 
     /** @var IdGeneratorInterface[] */
-    protected $classToIdGenerator;
+    protected array $classToIdGenerator;
 
-    /** @var array */
-    protected $aliasToClass;
+    protected array $aliasToClass;
 
     public function add($repoOrCallable, array $modelClasses, IdGeneratorInterface $idGenerator)
     {

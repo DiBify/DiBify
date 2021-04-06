@@ -25,10 +25,9 @@ abstract class Repository
 {
 
     /** @var ModelInterface[] */
-    protected $registered;
+    protected array $registered;
 
-    /** @var ReplicatorInterface */
-    protected $replicator;
+    protected ReplicatorInterface $replicator;
 
     public function __construct(ReplicatorInterface $replicator)
     {

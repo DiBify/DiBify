@@ -11,11 +11,9 @@ namespace DiBify\DiBify\Repository\Storage;
 class StorageData
 {
 
-    /** @var string */
-    public $id;
+    public string $id;
 
-    /** @var array */
-    public $body;
+    public array $body;
 
     public function __construct(string $id, array $body)
     {

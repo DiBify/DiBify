@@ -13,16 +13,14 @@ use DiBify\DiBify\Model\ModelInterface;
 
 class Transaction
 {
-    /** @var Id $id */
-    protected $id;
+    protected Id $id;
 
     /** @var ModelInterface[] */
-    protected $persisted = [];
+    protected array $persisted = [];
 
     /** @var ModelInterface[] */
-    protected $deleted = [];
+    protected array $deleted = [];
 
-    /** @var array */
     protected $metadata = [];
 
     /**
@@ -38,9 +36,6 @@ class Transaction
         $this->delete($deleted);
     }
 
-    /**
-     * @return Id
-     */
     public function id(): Id
     {
         return $this->id;
@@ -148,7 +143,7 @@ class Transaction
 
     /**
      * @param ModelInterface[] $models
-     * @param string $modelClass
+     * @param string|null $modelClass
      * @return ModelInterface[]
      */
     private function filter(array $models, string $modelClass = null): array

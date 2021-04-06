@@ -16,20 +16,17 @@ use JsonSerializable;
 final class Reference implements JsonSerializable
 {
 
-    /** @var Id */
-    private $id;
+    private Id $id;
 
-    /** @var string */
-    private $alias;
+    private string $alias;
 
-    /** @var ModelInterface|null */
-    private $model;
+    private ?ModelInterface $model;
 
     /** @var self[] */
-    private static $preload = [];
+    private static array $preload = [];
 
     /** @var self[] */
-    private static $references = [];
+    private static array $references = [];
 
     /**
      * ModelPointer constructor.
@@ -42,17 +39,11 @@ final class Reference implements JsonSerializable
         $this->id = $id;
     }
 
-    /**
-     * @return Id
-     */
     public function id(): Id
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getModelAlias(): string
     {
         return $this->alias;

@@ -15,11 +15,10 @@ use ReflectionException;
 class ObjectMapper implements MapperInterface
 {
 
-    /** @var string */
-    protected $classname;
+    protected string $classname;
 
     /** @var MapperInterface[] */
-    protected $mappers;
+    protected array $mappers;
 
     /**
      * ObjectMapper constructor.
@@ -33,7 +32,7 @@ class ObjectMapper implements MapperInterface
     }
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return array
      * @throws SerializerException

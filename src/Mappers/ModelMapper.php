@@ -16,8 +16,7 @@ use ReflectionException;
 class ModelMapper extends ObjectMapper
 {
 
-    /** @var string */
-    protected $idProperty;
+    protected string $idProperty;
 
     /**
      * ObjectMapper constructor.

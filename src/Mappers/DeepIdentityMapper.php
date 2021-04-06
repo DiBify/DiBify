@@ -25,26 +25,16 @@ use ReflectionProperty;
  */
 class DeepIdentityMapper implements MapperInterface
 {
-    /**
-     * @var array
-     */
-    private $classMap;
-    /**
-     * @var array
-     */
-    private $identityMap;
-    /**
-     * @var int
-     */
-    private $reflectionProperties;
-    /**
-     * @var ReflectionClass[]
-     */
-    private $reflectionClasses = [];
-    /**
-     * @var string
-     */
-    private $identityKey;
+    private array $classMap;
+
+    private array $identityMap;
+
+    private int $reflectionProperties;
+
+    /** @var ReflectionClass[] */
+    private array $reflectionClasses = [];
+
+    private string $identityKey;
 
     /**
      * DeepIdentityMapper constructor.
@@ -202,7 +192,6 @@ class DeepIdentityMapper implements MapperInterface
      * @param $class
      * @param string $exceptionClass
      * @return ReflectionClass
-     * @throws ReflectionException
      */
     protected function getReflectionClass($class, string $exceptionClass): ReflectionClass
     {

@@ -21,7 +21,7 @@ class ModelHelper
      * @throws NotPermanentIdException
      * @throws DuplicateModelException
      */
-    public static function indexById($models): array
+    public static function indexById(array $models): array
     {
         $indexed = [];
         foreach ($models as $model) {

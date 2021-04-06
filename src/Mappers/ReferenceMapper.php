@@ -14,8 +14,7 @@ use DiBify\DiBify\Model\Reference;
 class ReferenceMapper extends ObjectMapper
 {
 
-    /** @var bool */
-    private $eager;
+    private bool $eager;
 
     public function __construct(bool $eager = false)
     {

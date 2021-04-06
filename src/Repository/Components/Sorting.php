@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Created for DiBify
+ * Date: 08.03.2020
+ * @author Timur Kasumov (XAKEPEHOK)
+ */
 
 namespace DiBify\DiBify\Repository\Components;
 
@@ -11,14 +15,10 @@ class Sorting
 
     const SORT_ASC = 'ASC';
     const SORT_DESC = 'DESC';
-    /**
-     * @var string
-     */
-    private $field;
-    /**
-     * @var string
-     */
-    private $direction;
+
+    private string $field;
+
+    private string $direction;
 
     /**
      * Sort constructor.
@@ -37,17 +37,11 @@ class Sorting
         $this->direction = $direction;
     }
 
-    /**
-     * @return string
-     */
     public function getField(): string
     {
         return $this->field;
     }
 
-    /**
-     * @return string
-     */
     public function getDirection(): string
     {
         return $this->direction;

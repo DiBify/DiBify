@@ -17,7 +17,7 @@ class IntMapper implements MapperInterface
     use SharedMapperTrait;
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return int
      * @throws SerializerException

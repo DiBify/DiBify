@@ -12,10 +12,7 @@ use DiBify\DiBify\Exceptions\SerializerException;
 class NullOrMapper implements MapperInterface
 {
 
-    /**
-     * @var MapperInterface
-     */
-    private $mapper;
+    private MapperInterface $mapper;
 
     public function __construct(MapperInterface $mapper)
     {
@@ -23,7 +20,7 @@ class NullOrMapper implements MapperInterface
     }
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return mixed
      * @throws SerializerException

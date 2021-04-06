@@ -13,10 +13,7 @@ use DiBify\DiBify\Exceptions\SerializerException;
 class ArrayMapper implements MapperInterface
 {
 
-    /**
-     * @var MapperInterface
-     */
-    private $mapper;
+    private MapperInterface $mapper;
 
     public function __construct(MapperInterface $mapper)
     {

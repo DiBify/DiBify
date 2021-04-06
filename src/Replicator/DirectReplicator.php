@@ -14,11 +14,10 @@ use DiBify\DiBify\Repository\Storage\StorageInterface;
 class DirectReplicator implements ReplicatorInterface
 {
 
-    /** @var StorageInterface */
-    private $primary;
+    private StorageInterface $primary;
 
     /** @var StorageInterface[] */
-    private $slaves;
+    private array $slaves;
 
     public function __construct(StorageInterface $primary, array $slaves = [])
     {

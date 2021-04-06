@@ -17,8 +17,7 @@ class LazyIterator implements Iterator
     /** @var callable */
     protected $batchFetcher;
 
-    /** @var int */
-    protected $batchSize;
+    protected int $batchSize;
 
     /** @var callable */
     protected $onBeforeBatch;
@@ -26,20 +25,16 @@ class LazyIterator implements Iterator
     /** @var callable */
     protected $onAfterBatch;
 
-    /** @var bool */
-    private $preventPaginationOverlay;
+    private bool $preventPaginationOverlay;
 
-    /** @var Pagination */
-    private $pagination;
+    private Pagination $pagination;
 
-    /** @var array */
-    private $ids = [];
+    private array $ids = [];
 
     /** @var ModelInterface[] */
-    private $currentModels = [];
+    private array $currentModels = [];
 
-    /** @var int */
-    private $currentKey = 0;
+    private int $currentKey = 0;
 
     public function __construct(
         callable $batchFetcher,

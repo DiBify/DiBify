@@ -14,13 +14,10 @@ use Exception;
 class CallableMapper implements MapperInterface
 {
 
-    /**
-     * @var callable
-     */
+    /** @var callable */
     private $serialize;
-    /**
-     * @var callable
-     */
+
+    /** @var callable */
     private $deserialize;
 
     public function __construct(callable $serialize, callable $deserialize)
@@ -30,7 +27,7 @@ class CallableMapper implements MapperInterface
     }
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return mixed
      * @throws SerializerException

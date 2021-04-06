@@ -15,14 +15,11 @@ use ReflectionException;
 class ValueObjectMapper implements MapperInterface
 {
 
-    /**@var string */
-    protected $classname;
+    protected string $classname;
 
-    /**@var string */
-    protected $property;
+    protected string $property;
 
-    /** @var MapperInterface */
-    protected $mapper;
+    protected MapperInterface $mapper;
 
     public function __construct(string $classname, string $property, MapperInterface $mapper)
     {

@@ -6,8 +6,11 @@
 
 namespace DiBify\DiBify\Manager;
 
+use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
+use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
 use DiBify\DiBify\Helpers\ReflectionHelper;
 use DiBify\DiBify\Id\Id;
@@ -22,33 +25,22 @@ use Throwable;
 
 class ModelManager
 {
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-    /**
-     * @var Repository[]
-     */
-    private $repositories;
-    /**
-     * @var LockerInterface
-     */
-    private $locker;
-    /**
-     * @var callable
-     */
+    private ConfigManager $configManager;
+
+    /** @var Repository[] */
+    private array $repositories;
+
+    private LockerInterface $locker;
+
+    /** @var callable */
     private $onBeforeCommit;
-    /**
-     * @var callable
-     */
+
+    /** @var callable */
     private $onAfterCommit;
-    /**
-     * @var callable
-     */
+
+    /** @var callable */
     private $onCommitException;
-    /**
-     * @var static
-     */
+
     private static $instance;
 
     public function __construct(
@@ -90,8 +82,6 @@ class ModelManager
     /**
      * @param Reference $reference
      * @return ModelInterface|null
-     * @throws InvalidArgumentException
-     * @throws UnknownModelException
      */
     public static function findByReference(Reference $reference): ?ModelInterface
     {
@@ -104,7 +94,6 @@ class ModelManager
      * @param Reference[] $references
      * @return SplObjectStorage
      * @throws InvalidArgumentException
-     * @throws UnknownModelException
      */
     public static function findByReferences(array $references): SplObjectStorage
     {
@@ -157,10 +146,14 @@ class ModelManager
 
     /**
      * @param Transaction $transaction
-     * @param Lock $lock
+     * @param Lock|null $lock
      * @throws InvalidArgumentException
+     * @throws LockedModelException
      * @throws Throwable
      * @throws UnknownModelException
+     * @throws DuplicateModelException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
      */
     public function commit(Transaction $transaction, Lock $lock = null): void
     {

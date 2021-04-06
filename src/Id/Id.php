@@ -13,13 +13,8 @@ use JsonSerializable;
 class Id implements JsonSerializable
 {
 
-    /** @var string|null */
-    private $value;
+    private ?string $value = null;
 
-    /**
-     * Id constructor.
-     * @param string $value
-     */
     public function __construct(string $value = null)
     {
         if (is_null($value) === false) {
@@ -81,7 +76,7 @@ class Id implements JsonSerializable
         return false;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->value;
     }

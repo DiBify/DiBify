@@ -15,7 +15,7 @@ interface MapperInterface
 {
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return mixed
      * @throws SerializerException

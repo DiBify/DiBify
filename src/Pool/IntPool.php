@@ -11,14 +11,9 @@ namespace DiBify\DiBify\Pool;
 class IntPool implements PoolInterface
 {
 
-    /**
-     * @var int
-     */
-    private $current;
-    /**
-     * @var int
-     */
-    private $pool;
+    private int $current;
+
+    private int $pool;
 
     /**
      * IntPool constructor.

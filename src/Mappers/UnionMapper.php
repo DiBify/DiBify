@@ -13,10 +13,8 @@ use DiBify\DiBify\Mappers\Components\UnionRule;
 class UnionMapper implements MapperInterface
 {
 
-    /**
-     * @var UnionRule[]
-     */
-    private $rules;
+    /** @var UnionRule[] */
+    private array $rules;
 
     /**
      * UnionMapper constructor.
@@ -28,7 +26,7 @@ class UnionMapper implements MapperInterface
     }
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param $complex
      * @return mixed
      * @throws SerializerException

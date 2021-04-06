@@ -11,14 +11,9 @@ namespace DiBify\DiBify\Pool;
 class FloatPool implements PoolInterface
 {
 
-    /**
-     * @var float
-     */
-    private $current;
-    /**
-     * @var float
-     */
-    private $pool;
+    private float $current;
+
+    private float $pool;
 
     /**
      * FloatPool constructor.

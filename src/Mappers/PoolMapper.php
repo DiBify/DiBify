@@ -14,14 +14,9 @@ use DiBify\DiBify\Pool\PoolInterface;
 class PoolMapper implements MapperInterface
 {
 
-    /**
-     * @var string
-     */
-    private $poolClass;
-    /**
-     * @var MapperInterface
-     */
-    private $mapper;
+    private string $poolClass;
+
+    private MapperInterface $mapper;
 
     public function __construct(string $poolClass, MapperInterface $mapper)
     {

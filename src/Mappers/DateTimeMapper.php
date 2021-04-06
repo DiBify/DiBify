@@ -15,10 +15,8 @@ use DiBify\DiBify\Exceptions\SerializerException;
 
 class DateTimeMapper implements MapperInterface
 {
-    /**
-     * @var string
-     */
-    private $immutable;
+
+    private bool $immutable;
 
     public function __construct($immutable = true)
     {
@@ -26,7 +24,7 @@ class DateTimeMapper implements MapperInterface
     }
 
     /**
-     * Convert complex data (like object) to simpe data (scalar, null, array)
+     * Convert complex data (like object) to simple data (scalar, null, array)
      * @param DateTimeInterface $complex
      * @return int|null
      * @throws SerializerException

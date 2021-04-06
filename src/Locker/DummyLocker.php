@@ -12,7 +12,7 @@ class DummyLocker implements LockerInterface
 {
 
     /** @var ModelInterface[][] */
-    private $locks = [];
+    private array $locks = [];
 
     public function lock(ModelInterface $model, ModelInterface $locker, int $timeout = null): bool
     {

@@ -17,13 +17,13 @@ class ReflectionHelper
 {
 
     /** @var ReflectionClass[] */
-    private static $reflectionClasses = [];
+    private static array $reflectionClasses = [];
 
     /** @var ReflectionProperty[] */
-    private static $reflectionProperties = [];
+    private static array $reflectionProperties = [];
 
     /** @var ReflectionMethod[] */
-    private static $reflectionMethods = [];
+    private static array $reflectionMethods = [];
 
     /**
      * @param string $class

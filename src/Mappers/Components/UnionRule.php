@@ -13,17 +13,12 @@ use DiBify\DiBify\Mappers\MapperInterface;
 class UnionRule
 {
 
-    /**
-     * @var MapperInterface
-     */
-    private $mapper;
-    /**
-     * @var callable
-     */
+    private MapperInterface $mapper;
+
+    /** @var callable */
     private $serialize;
-    /**
-     * @var callable
-     */
+
+    /** @var callable */
     private $deserialize;
 
     public function __construct(MapperInterface $mapper, callable $serialize, callable $deserialize)

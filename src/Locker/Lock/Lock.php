@@ -13,11 +13,9 @@ use DiBify\DiBify\Model\ModelInterface;
 class Lock
 {
 
-    /** @var ModelInterface */
-    private $locker;
+    private ModelInterface $locker;
 
-    /** @var int|null */
-    private $timeout;
+    private ?int $timeout;
 
     public function __construct(ModelInterface $locker, int $timeout = null)
     {
@@ -25,17 +23,11 @@ class Lock
         $this->timeout = $timeout;
     }
 
-    /**
-     * @return ModelInterface
-     */
     public function getLocker(): ModelInterface
     {
         return $this->locker;
     }
 
-    /**
-     * @return int|null
-     */
     public function getTimeout(): ?int
     {
         return $this->timeout;
