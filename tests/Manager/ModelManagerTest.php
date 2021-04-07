@@ -134,6 +134,9 @@ class ModelManagerTest extends TestCase
         $this->assertEquals('3', (string) $model->id());
     }
 
+    //todo public function testRefreshOne(): void
+
+    //todo public function testRefreshMany(): void
 
     public function testCommitWithServiceUnlock()
     {

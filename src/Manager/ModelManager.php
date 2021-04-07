@@ -9,6 +9,7 @@ namespace DiBify\DiBify\Manager;
 use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
+use DiBify\DiBify\Exceptions\ModelRefreshException;
 use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
@@ -138,6 +139,53 @@ class ModelManager
 
         $repo = $this->getRepository($modelAliasOrClass);
         return $repo->findById($argument);
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @return ModelInterface
+     * @throws DuplicateModelException
+     * @throws InvalidArgumentException
+     * @throws ModelRefreshException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
+     * @throws UnknownModelException
+     */
+    public function refreshOne(ModelInterface $model): ModelInterface
+    {
+        $repo = $this->getRepository($model);
+        $changes = $repo->refresh($model);
+
+        if (!isset($changes[$model])) {
+            throw new ModelRefreshException('Model was not refreshed, because it was not found (may be was deleted)');
+        }
+
+        return $changes[$model];
+    }
+
+    /**
+     * @param ModelInterface ...$models
+     * @return SplObjectStorage
+     * @throws DuplicateModelException
+     * @throws InvalidArgumentException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
+     * @throws UnknownModelException
+     */
+    public function refreshMany(ModelInterface ...$models): SplObjectStorage
+    {
+        $groups = [];
+        foreach ($models as $model) {
+            $groups[get_class($model)][] = $model;
+        }
+
+        $changes = new SplObjectStorage();
+
+        foreach ($groups as $class => $models) {
+            $changes->addAll($this->getRepository($class)->refresh(...$models));
+        }
+
+        return $changes;
     }
 
     /**
