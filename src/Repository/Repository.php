@@ -79,7 +79,7 @@ abstract class Repository
      * @throws NotPermanentIdException
      * @throws SerializerException
      */
-    public function refresh($models): SplObjectStorage
+    public function refresh(ModelInterface ...$models): SplObjectStorage
     {
         $map = new SplObjectStorage();
         $models = ModelHelper::indexById($models);
