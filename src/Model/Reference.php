@@ -20,7 +20,7 @@ final class Reference implements JsonSerializable
 
     private string $alias;
 
-    private ?ModelInterface $model;
+    private ?ModelInterface $model = null;
 
     /** @var self[] */
     private static array $preload = [];
