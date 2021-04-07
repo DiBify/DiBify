@@ -93,16 +93,12 @@ class ModelManager
     /**
      * @param Reference[] $references
      * @return SplObjectStorage
-     * @throws InvalidArgumentException
      */
-    public static function findByReferences(array $references): SplObjectStorage
+    public static function findByReferences(Reference ...$references): SplObjectStorage
     {
         $instance = static::$instance;
         $groups = [];
         foreach ($references as $reference) {
-            if (!($reference instanceof Reference)) {
-                throw new InvalidArgumentException("Every reference should be instance of " . Reference::class, 1);
-            }
             $alias = $reference->getModelAlias();
             $id = (string) $reference->id();
             $groups[$alias][$id] = $reference;

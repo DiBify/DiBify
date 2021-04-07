@@ -7,7 +7,6 @@
 namespace DiBify\DiBify\Manager;
 
 
-use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Id\UuidGenerator;
@@ -106,16 +105,9 @@ class ModelManagerTest extends TestCase
         $reference_1 = Reference::create(TestModel_1::getModelAlias(), 1);
         $reference_2 = Reference::create(TestModel_2::getModelAlias(), 2);
 
-        $storage = $this->manager->findByReferences([$reference_1, $reference_2]);
+        $storage = $this->manager->findByReferences($reference_1, $reference_2);
         $this->assertTrue($reference_1->isFor($storage[$reference_1]));
         $this->assertTrue($reference_2->isFor($storage[$reference_2]));
-    }
-
-    public function testFindByReferencesWithNotReference()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionCode(1);
-        $this->manager->findByReferences([$this]);
     }
 
     public function testFindByAnyTypeId()

@@ -62,12 +62,11 @@ final class Reference implements JsonSerializable
 
         self::preload($this);
 
-        /** @var Reference[] $references */
         $references = array_filter(self::$preload, function (Reference $reference) {
             return $reference->model === null;
         });
 
-        $objectStorage = ModelManager::findByReferences($references);
+        $objectStorage = ModelManager::findByReferences(...$references);
         foreach ($objectStorage as $reference) {
             /** @var Reference $reference */
             $reference->model = $objectStorage[$reference];
