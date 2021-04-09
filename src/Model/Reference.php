@@ -54,7 +54,7 @@ final class Reference implements JsonSerializable
         return $this->getModelAlias() === $model::getModelAlias() && $this->id->isEqual($model);
     }
 
-    public function getModel(): ?ModelInterface
+    public function getModel(): ModelInterface
     {
         if ($this->model) {
             return $this->model;
