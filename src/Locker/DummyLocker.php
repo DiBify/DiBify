@@ -7,12 +7,19 @@ namespace DiBify\DiBify\Locker;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
+use SplObjectStorage;
 
 class DummyLocker implements LockerInterface
 {
 
-    /** @var ModelInterface[][] */
-    private array $locks = [];
+    private SplObjectStorage $locks;
+    private int $defaultTimeout;
+
+    public function __construct(int $defaultTimeout = 60)
+    {
+        $this->locks = new SplObjectStorage();
+        $this->defaultTimeout = $defaultTimeout;
+    }
 
     public function lock(ModelInterface $model, ModelInterface $locker, int $timeout = null): bool
     {
@@ -21,10 +28,11 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        $name = $model::getModelAlias();
-        $id = (string) $model->id();
+        if (is_null($timeout)) {
+            $timeout = $this->getDefaultTimeout();
+        }
 
-        $this->locks[$name][$id] = $locker;
+        $this->locks[$model] = [$locker, time() + $timeout];
         return true;
     }
 
@@ -35,10 +43,7 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        $name = $model::getModelAlias();
-        $id = (string) $model->id();
-
-        unset($this->locks[$name][$id]);
+        unset($this->locks[$model]);
         return true;
     }
 
@@ -49,23 +54,24 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        $name = $model::getModelAlias();
-        $id = (string) $model->id();
-
-        $this->locks[$name][$id] = $nextLocker;
+        $this->locks[$model] = $nextLocker;
         return true;
     }
 
     public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool
     {
-        $name = $model::getModelAlias();
-        $id = (string) $model->id();
-
-        if (!isset($this->locks[$name][$id])) {
+        if (!isset($this->locks[$model])) {
             return false;
         }
 
-        $currentLocker = $this->locks[$name][$id];
+        $data = $this->locks[$model];
+
+        if (time() > $data[1]) {
+            unset($this->locks[$model]);
+            return false;
+        }
+
+        $currentLocker = $data[0];
         return $currentLocker !== $locker;
     }
 
@@ -75,19 +81,24 @@ class DummyLocker implements LockerInterface
      */
     public function getLocker($modelOrReference): ?Reference
     {
+        $reference = null;
         if ($modelOrReference instanceof ModelInterface) {
-            $name = $modelOrReference::getModelAlias();
-            $id = (string) $modelOrReference->id();
+            $reference = Reference::to($modelOrReference);
         }
 
         if ($modelOrReference instanceof Reference) {
-            $name = $modelOrReference->getModelAlias();
-            $id = (string) $modelOrReference->id();
+            $reference = $modelOrReference;
         }
 
-        if (isset($name) && isset($id)) {
-            if (isset($this->locks[$name][$id])) {
-                return Reference::to($this->locks[$name][$id]);
+        if (!is_null($reference)) {
+            $model = $reference->getModel();
+            if (isset($this->locks[$model])) {
+                $data = $this->locks[$model];
+                if (time() > $data[1]) {
+                    unset($this->locks[$model]);
+                    return null;
+                }
+                return Reference::to($data[0]);
             }
             return null;
         }
@@ -97,7 +108,7 @@ class DummyLocker implements LockerInterface
 
     public function getDefaultTimeout(): int
     {
-        return 10;
+        return $this->defaultTimeout;
     }
 
 }

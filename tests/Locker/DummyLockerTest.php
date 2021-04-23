@@ -11,26 +11,13 @@ use PHPUnit\Framework\TestCase;
 class DummyLockerTest extends TestCase
 {
 
-    /** @var DummyLocker */
-    private $dummy;
-
-    /** @var ModelInterface */
-    private $locker_1;
-
-    /** @var ModelInterface */
-    private $locker_2;
-
-    /** @var ModelInterface */
-    private $locker_3;
-
-    /** @var ModelInterface */
-    private $model_1;
-
-    /** @var ModelInterface */
-    private $model_2;
-
-    /** @var ModelInterface */
-    private $model_3;
+    private DummyLocker $dummy;
+    protected ModelInterface $locker_1;
+    private ModelInterface $locker_2;
+    private ModelInterface $locker_3;
+    private ModelInterface $model_1;
+    private ModelInterface $model_2;
+    private ModelInterface $model_3;
 
     protected function setUp(): void
     {
@@ -50,35 +37,47 @@ class DummyLockerTest extends TestCase
         $this->dummy->lock($this->model_2, $this->locker_2);
     }
 
-    public function testLock()
+    public function testLock(): void
     {
         $this->assertTrue($this->dummy->lock($this->model_1, $this->locker_1));
         $this->assertTrue($this->dummy->lock($this->model_3, $this->locker_3));
         $this->assertFalse($this->dummy->lock($this->model_3, $this->locker_1));
     }
 
-    public function testUnlock()
+    public function testUnlock(): void
     {
         $this->assertTrue($this->dummy->unlock($this->model_1, $this->locker_1));
         $this->assertTrue($this->dummy->unlock($this->model_3, $this->locker_3));
         $this->assertFalse($this->dummy->unlock($this->model_2, $this->locker_1));
     }
 
-    public function testPassLock()
+    public function testPassLock(): void
     {
         $this->assertFalse($this->dummy->passLock($this->model_2, $this->locker_1, $this->locker_2));
         $this->assertFalse($this->dummy->passLock($this->model_2, $this->locker_1, $this->locker_3));
         $this->assertTrue($this->dummy->passLock($this->model_1, $this->locker_1, $this->locker_2));
     }
 
-    public function testIsLockedFor()
+    public function testIsLockedFor(): void
     {
         $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
         $this->assertFalse($this->dummy->isLockedFor($this->model_1, $this->locker_1));
         $this->assertFalse($this->dummy->isLockedFor($this->model_3, $this->locker_1));
     }
 
-    public function testGetLocker()
+    public function testIsLockedForWithTimeout(): void
+    {
+        $this->dummy->lock($this->model_1, $this->locker_1, 3);
+        $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
+        sleep(1);
+        $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
+        sleep(1);
+        $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
+        sleep(2);
+        $this->assertFalse($this->dummy->isLockedFor($this->model_1, $this->locker_2));
+    }
+
+    public function testGetLocker(): void
     {
         $lockerReference = $this->dummy->getLocker($this->model_1);
         $this->assertTrue($lockerReference->isFor($this->locker_1));
@@ -91,8 +90,23 @@ class DummyLockerTest extends TestCase
         $this->assertNull($lockerReference);
     }
 
-    public function testGetDefaultTimeout()
+    public function testGetLockerWithTimeout(): void
     {
-        $this->assertEquals(10, $this->dummy->getDefaultTimeout());
+        $this->dummy->lock($this->model_1, $this->locker_1, 3);
+        $lockerReference = $this->dummy->getLocker($this->model_1);
+        $this->assertTrue($lockerReference->isFor($this->locker_1));
+        sleep(1);
+        $lockerReference = $this->dummy->getLocker($this->model_1);
+        $this->assertTrue($lockerReference->isFor($this->locker_1));
+        sleep(1);
+        $lockerReference = $this->dummy->getLocker($this->model_1);
+        $this->assertTrue($lockerReference->isFor($this->locker_1));
+        sleep(2);
+        $this->assertNull($this->dummy->getLocker($this->model_1));
+    }
+
+    public function testGetDefaultTimeout(): void
+    {
+        $this->assertEquals(60, $this->dummy->getDefaultTimeout());
     }
 }
