@@ -14,6 +14,8 @@ class DummyLocker implements LockerInterface
 
     private SplObjectStorage $locks;
     private int $defaultTimeout;
+    private array $onLockHandlers = [];
+    private array $onUnlockHandlers = [];
 
     public function __construct(int $defaultTimeout = 60)
     {
@@ -28,11 +30,8 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        if (is_null($timeout)) {
-            $timeout = $this->getDefaultTimeout();
-        }
+        $this->lockModel($model, $locker, $timeout);
 
-        $this->locks[$model] = [$locker, time() + $timeout];
         return true;
     }
 
@@ -43,7 +42,7 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        unset($this->locks[$model]);
+        $this->unlockModel($model);
         return true;
     }
 
@@ -54,7 +53,7 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        $this->locks[$model] = $nextLocker;
+        $this->lockModel($model, $nextLocker, $timeout);
         return true;
     }
 
@@ -67,7 +66,7 @@ class DummyLocker implements LockerInterface
         $data = $this->locks[$model];
 
         if (time() > $data[1]) {
-            unset($this->locks[$model]);
+            $this->unlockModel($model);
             return false;
         }
 
@@ -95,7 +94,7 @@ class DummyLocker implements LockerInterface
             if (isset($this->locks[$model])) {
                 $data = $this->locks[$model];
                 if (time() > $data[1]) {
-                    unset($this->locks[$model]);
+                    $this->unlockModel($model);
                     return null;
                 }
                 return Reference::to($data[0]);
@@ -109,6 +108,36 @@ class DummyLocker implements LockerInterface
     public function getDefaultTimeout(): int
     {
         return $this->defaultTimeout;
+    }
+
+    public function addOnLockHandler(callable $handler): void
+    {
+        $this->onLockHandlers[] = $handler;
+    }
+
+    public function addOnUnlockHandler(callable $handler): void
+    {
+        $this->onUnlockHandlers[] = $handler;
+    }
+
+    private function lockModel(ModelInterface $model, ModelInterface $locker, int $timeout = null): void
+    {
+        if (is_null($timeout)) {
+            $timeout = $this->getDefaultTimeout();
+        }
+
+        $this->locks[$model] = [$locker, time() + $timeout];
+        foreach ($this->onLockHandlers as $onLockHandler) {
+            $onLockHandler($model, $locker);
+        }
+    }
+
+    private function unlockModel(ModelInterface $model): void
+    {
+        unset($this->locks[$model]);
+        foreach ($this->onUnlockHandlers as $onUnlockHandler) {
+            $onUnlockHandler($model);
+        }
     }
 
 }

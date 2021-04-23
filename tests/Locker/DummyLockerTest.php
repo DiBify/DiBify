@@ -7,6 +7,7 @@ use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Model\ModelInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DummyLockerTest extends TestCase
 {
@@ -39,20 +40,54 @@ class DummyLockerTest extends TestCase
 
     public function testLock(): void
     {
+        $locks = [];
+        $this->dummy->addOnLockHandler(function (ModelInterface $model, ModelInterface $locker) use (&$locks) {
+            $locks[] = [$model, $locker];
+        });
+
+        $this->dummy->addOnUnlockHandler(function () {
+            throw new RuntimeException();
+        });
+
         $this->assertTrue($this->dummy->lock($this->model_1, $this->locker_1));
         $this->assertTrue($this->dummy->lock($this->model_3, $this->locker_3));
         $this->assertFalse($this->dummy->lock($this->model_3, $this->locker_1));
+
+        $this->assertSame([
+            [$this->model_1, $this->locker_1],
+            [$this->model_3, $this->locker_3],
+        ], $locks);
     }
 
     public function testUnlock(): void
     {
+        $unlocks = [];
+        $this->dummy->addOnLockHandler(function () {
+            throw new RuntimeException();
+        });
+
+        $this->dummy->addOnUnlockHandler(function (ModelInterface $model) use (&$unlocks) {
+            $unlocks[] = $model;
+        });
+
         $this->assertTrue($this->dummy->unlock($this->model_1, $this->locker_1));
         $this->assertTrue($this->dummy->unlock($this->model_3, $this->locker_3));
         $this->assertFalse($this->dummy->unlock($this->model_2, $this->locker_1));
+
+        $this->assertSame([$this->model_1, $this->model_3], $unlocks);
     }
 
     public function testPassLock(): void
     {
+        $this->dummy->addOnLockHandler(function (ModelInterface $model, ModelInterface $locker) {
+            $this->assertSame($this->model_1,$model);
+            $this->assertSame($this->locker_2,$locker);
+        });
+
+        $this->dummy->addOnUnlockHandler(function () {
+            throw new RuntimeException();
+        });
+
         $this->assertFalse($this->dummy->passLock($this->model_2, $this->locker_1, $this->locker_2));
         $this->assertFalse($this->dummy->passLock($this->model_2, $this->locker_1, $this->locker_3));
         $this->assertTrue($this->dummy->passLock($this->model_1, $this->locker_1, $this->locker_2));
@@ -67,6 +102,15 @@ class DummyLockerTest extends TestCase
 
     public function testIsLockedForWithTimeout(): void
     {
+        $this->dummy->addOnLockHandler(function (ModelInterface $model, ModelInterface $locker) {
+            $this->assertSame($this->model_1, $model);
+            $this->assertSame($this->locker_1, $locker);
+        });
+
+        $this->dummy->addOnUnlockHandler(function (ModelInterface $model){
+            $this->assertSame($this->model_1, $model);
+        });
+
         $this->dummy->lock($this->model_1, $this->locker_1, 3);
         $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
         sleep(1);
@@ -92,6 +136,15 @@ class DummyLockerTest extends TestCase
 
     public function testGetLockerWithTimeout(): void
     {
+        $this->dummy->addOnLockHandler(function (ModelInterface $model, ModelInterface $locker) {
+            $this->assertSame($this->model_1, $model);
+            $this->assertSame($this->locker_1, $locker);
+        });
+
+        $this->dummy->addOnUnlockHandler(function (ModelInterface $model){
+            $this->assertSame($this->model_1, $model);
+        });
+
         $this->dummy->lock($this->model_1, $this->locker_1, 3);
         $lockerReference = $this->dummy->getLocker($this->model_1);
         $this->assertTrue($lockerReference->isFor($this->locker_1));
