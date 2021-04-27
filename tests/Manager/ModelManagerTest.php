@@ -148,8 +148,8 @@ class ModelManagerTest extends TestCase
         $model_3 = $this->repo_1->findById(3);
 
         $transaction = new Transaction();
-        $transaction->persists([$model_1, $model_2]);
-        $transaction->delete([$model_3]);
+        $transaction->persists($model_1, $model_2);
+        $transaction->delete($model_3);
 
         $this->manager->commit($transaction, $lock);
 
@@ -245,7 +245,7 @@ class ModelManagerTest extends TestCase
         $this->assertFalse($model->onAfterCommit);
 
         $transaction = new Transaction();
-        $transaction->persists([$model]);
+        $transaction->persists($model);
 
         $this->assertFalse($model->onBeforeCommit);
         $this->assertFalse($model->onAfterCommit);

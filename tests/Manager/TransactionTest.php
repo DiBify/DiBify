@@ -7,25 +7,25 @@
 
 namespace DiBify\DiBify\Manager;
 
-use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Mock\TestModel_2;
 use DiBify\DiBify\Mock\TestModel_3;
 use DiBify\DiBify\Model\ModelInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class TransactionTest extends TestCase
 {
 
     /** @var ModelInterface[] */
-    private $persisted;
+    private array $persisted;
 
     /** @var ModelInterface[] */
-    private $deleted;
+    private array $deleted;
 
-    /** @var Transaction */
-    private $transaction;
+    private Transaction $transaction;
 
     protected function setUp(): void
     {
@@ -80,11 +80,11 @@ class TransactionTest extends TestCase
      * @dataProvider invalidModelsProvider
      * @param array $persisted
      * @param array $deleted
-     * @throws NotModelInterfaceException
+     * @throws Exception
      */
     public function testConstructWithNonModels(array $persisted, array $deleted)
     {
-        $this->expectException(NotModelInterfaceException::class);
+        $this->expectException(TypeError::class);
         new Transaction($persisted, $deleted);
     }
 

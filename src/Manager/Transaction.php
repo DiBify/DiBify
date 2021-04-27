@@ -6,10 +6,10 @@
 namespace DiBify\DiBify\Manager;
 
 
-use DiBify\DiBify\Exceptions\NotModelInterfaceException;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Id\UuidGenerator;
 use DiBify\DiBify\Model\ModelInterface;
+use Exception;
 
 class Transaction
 {
@@ -21,19 +21,19 @@ class Transaction
     /** @var ModelInterface[] */
     protected array $deleted = [];
 
-    protected $metadata = [];
+    protected array $metadata = [];
 
     /**
      * Commit constructor.
      * @param ModelInterface[] $persisted
      * @param ModelInterface[] $deleted
-     * @throws NotModelInterfaceException
+     * @throws Exception
      */
     public function __construct(array $persisted = [], array $deleted = [])
     {
         $this->id = new Id(UuidGenerator::generate());
-        $this->persists($persisted);
-        $this->delete($deleted);
+        $this->persists(...$persisted);
+        $this->delete(...$deleted);
     }
 
     public function id(): Id
@@ -63,11 +63,9 @@ class Transaction
     /**
      * Prepare model to store it in DB
      * @param ModelInterface[] $models
-     * @throws NotModelInterfaceException
      */
-    public function persists(array $models = []): void
+    public function persists(ModelInterface ...$models): void
     {
-        $this->guardNotModelInterface($models);
         foreach ($models as $model) {
             $hash = spl_object_hash($model);
             $this->persisted[$hash] = $model;
@@ -114,11 +112,9 @@ class Transaction
     /**
      * Prepare models for delete it from DB
      * @param ModelInterface[] $models
-     * @throws NotModelInterfaceException
      */
-    public function delete(array $models = []): void
+    public function delete(ModelInterface ...$models): void
     {
-        $this->guardNotModelInterface($models);
         foreach ($models as $model) {
             $hash = spl_object_hash($model);
             $this->deleted[$hash] = $model;
@@ -156,19 +152,6 @@ class Transaction
             array_filter($models, function (ModelInterface $model) use ($modelClass) {
             return get_class($model) === $modelClass;
         }));
-    }
-
-    /**
-     * @param array $models
-     * @throws NotModelInterfaceException
-     */
-    private function guardNotModelInterface(array $models)
-    {
-        foreach ($models as $model) {
-            if (!($model instanceof ModelInterface)) {
-                throw new NotModelInterfaceException($model);
-            }
-        }
     }
 
 }
