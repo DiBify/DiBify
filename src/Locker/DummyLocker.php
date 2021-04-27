@@ -74,6 +74,31 @@ class DummyLocker implements LockerInterface
         return $currentLocker !== $locker;
     }
 
+    public function waitForLock(array $models, ModelInterface $locker, int $waitTimeout, int $lockTimeout = null): bool
+    {
+        $started = time();
+        do {
+            $lockedCount = 0;
+            foreach ($models as $model) {
+                if ($this->lock($model, $locker, $lockTimeout)) {
+                    $lockedCount++;
+                }
+            }
+            sleep(1);
+            $isLocked = count($models) === $lockedCount;
+            $duration = time() - $started;
+        } while (!$isLocked && $duration < $waitTimeout);
+
+        if (!$isLocked) {
+            foreach ($models as $model) {
+                $this->unlock($model, $locker);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @inheritDoc
      * @throws InvalidArgumentException

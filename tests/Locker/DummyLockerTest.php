@@ -93,6 +93,34 @@ class DummyLockerTest extends TestCase
         $this->assertTrue($this->dummy->passLock($this->model_1, $this->locker_1, $this->locker_2));
     }
 
+    public function testWaitForLock(): void
+    {
+        $this->dummy->lock($this->model_1, $this->locker_1);
+        $this->dummy->lock($this->model_2, $this->locker_2);
+        $this->dummy->lock($this->model_3, $this->locker_2);
+
+        $this->assertFalse(
+            $this->dummy->waitForLock(
+                [$this->model_1, $this->model_2, $this->model_3],
+                $this->locker_3,
+                5
+            )
+        );
+
+        $this->dummy->lock($this->model_1, $this->locker_1, 2);
+        $this->dummy->lock($this->model_2, $this->locker_2, 2);
+        $this->dummy->lock($this->model_3, $this->locker_2, 2);
+
+        $this->assertTrue(
+            $this->dummy->waitForLock(
+                [$this->model_1, $this->model_2, $this->model_3],
+                $this->locker_3,
+                5,
+                5
+            )
+        );
+    }
+
     public function testIsLockedFor(): void
     {
         $this->assertTrue($this->dummy->isLockedFor($this->model_1, $this->locker_2));
