@@ -23,8 +23,12 @@ trait WaitForLockTrait
                     $lockedCount++;
                 }
             }
+
+            if ($isLocked = count($models) === $lockedCount) {
+                break;
+            }
+
             sleep(1);
-            $isLocked = count($models) === $lockedCount;
             $duration = time() - $started;
         } while (!$isLocked && $duration < $waitTimeout);
 
