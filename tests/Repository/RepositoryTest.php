@@ -80,6 +80,8 @@ class RepositoryTest extends TestCase
 
         $changes = $this->repo->refresh($model_1, $model_2, $model_3);
 
+        $this->assertNotNull($changes[$model_1]);
+        $this->assertNotNull($changes[$model_2]);
         $this->assertNotSame($model_1, $changes[$model_1]);
         $this->assertSame($model_2, $changes[$model_2]);
         $this->assertNull($changes[$model_3]);
