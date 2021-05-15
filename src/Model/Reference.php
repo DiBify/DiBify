@@ -77,16 +77,17 @@ final class Reference implements JsonSerializable
         return $this->model;
     }
 
-    /**
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by json_encode
-     */
     public function jsonSerialize()
     {
         return [
             'alias' => $this->alias,
             'id' => (string) $this->id,
         ];
+    }
+
+    public function __toString(): string
+    {
+        return json_encode($this);
     }
 
     /**
