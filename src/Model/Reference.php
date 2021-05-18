@@ -137,9 +137,11 @@ final class Reference implements JsonSerializable
         return $reference;
     }
 
-    public static function preload(Reference $reference): void
+    public static function preload(Reference ...$references): void
     {
-        self::$preload[] = $reference;
+        foreach ($references as $reference) {
+            self::$preload[] = $reference;
+        }
     }
 
     public static function freeUpMemory(): void
