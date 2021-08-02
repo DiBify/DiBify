@@ -16,6 +16,9 @@ class ReferenceMapper extends ObjectMapper
 
     private bool $eager;
 
+    private static self $instanceEager;
+    private static self $instanceLazy;
+
     public function __construct(bool $eager = false)
     {
         $this->eager = $eager;
@@ -38,6 +41,22 @@ class ReferenceMapper extends ObjectMapper
         }
 
         return $reference;
+    }
+
+    public static function getInstanceEager(): self
+    {
+        if (!isset(static::$instanceEager)) {
+            static::$instanceEager = new static(true);
+        }
+        return static::$instanceEager;
+    }
+
+    public static function getInstanceLazy(): self
+    {
+        if (!isset(static::$instanceLazy)) {
+            static::$instanceLazy = new static(false);
+        }
+        return static::$instanceLazy;
     }
 
 }
