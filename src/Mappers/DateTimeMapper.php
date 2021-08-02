@@ -18,6 +18,9 @@ class DateTimeMapper implements MapperInterface
 
     private bool $immutable;
 
+    private static self $instanceImmutable;
+    private static self $instanceMutable;
+
     public function __construct($immutable = true)
     {
         $this->immutable = $immutable;
@@ -67,5 +70,21 @@ class DateTimeMapper implements MapperInterface
     protected function classname(): string
     {
         return $this->immutable ? DateTimeImmutable::class : DateTime::class;
+    }
+
+    public static function getInstanceImmutable(): self
+    {
+        if (!isset(static::$instanceImmutable)) {
+            static::$instanceImmutable = new static(true);
+        }
+        return static::$instanceImmutable;
+    }
+
+    public static function getInstanceMutable(): self
+    {
+        if (!isset(static::$instanceMutable)) {
+            static::$instanceMutable = new static(false);
+        }
+        return static::$instanceMutable;
     }
 }
