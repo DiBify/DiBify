@@ -11,6 +11,7 @@ namespace DiBify\DiBify\Mappers;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use DiBify\DiBify\Exceptions\SerializerException;
 
 class DateTimeMapper implements MapperInterface
@@ -20,6 +21,7 @@ class DateTimeMapper implements MapperInterface
 
     private static self $instanceImmutable;
     private static self $instanceMutable;
+    private static array $timezones = [];
 
     public function __construct($immutable = true)
     {
@@ -56,12 +58,18 @@ class DateTimeMapper implements MapperInterface
 
         /** @var DateTime $classname */
         $classname = $this->classname();
+
+        /** @var DateTime|DateTimeImmutable $datetime */
         $datetime = new $classname("@{$data}");
         if (!$datetime) {
             throw new SerializerException("Invalid format '{$data}' for restoring '{$this->classname()}'");
         }
 
-        return $datetime;
+        if (!isset(self::$timezones[date_default_timezone_get()])) {
+            self::$timezones[date_default_timezone_get()] = new DateTimeZone(date_default_timezone_get());
+        }
+
+        return $datetime->setTimezone(self::$timezones[date_default_timezone_get()]);
     }
 
     /**
