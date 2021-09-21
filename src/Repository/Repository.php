@@ -97,7 +97,7 @@ abstract class Repository
                 $map[$model] = $model;
             } else {
                 $map[$model] = $refreshed;
-                $this->register($model, true);
+                $this->register($refreshed, true);
             }
         }
 
