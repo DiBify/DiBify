@@ -43,17 +43,17 @@ class TestStorage implements StorageInterface
         return $result;
     }
 
-    public function insert(StorageData $data): void
+    public function insert(StorageData $data, array $options = []): void
     {
         $this->data[$data->id] = $data;
     }
 
-    public function update(StorageData $data): void
+    public function update(StorageData $data, array $options = []): void
     {
         $this->data[$data->id] = $data;
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, array $options = []): void
     {
         unset($this->data[$id]);
     }
