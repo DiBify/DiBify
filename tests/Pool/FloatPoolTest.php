@@ -18,7 +18,7 @@ class FloatPoolTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->pool = new FloatPool(100.1, 10.1);
+        $this->pool = new FloatPool(100.10, 10.10);
     }
 
     public function testGetCurrent()
@@ -33,7 +33,7 @@ class FloatPoolTest extends TestCase
 
     public function testGetResult()
     {
-        $this->assertSame(110.2, $this->pool->getResult());
+        $this->assertSame(110.2, round($this->pool->getResult(), 1));
     }
 
     public function testAdd()

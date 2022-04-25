@@ -49,7 +49,7 @@ class PoolMapper implements MapperInterface
     {
         if (is_array($data)) {
             if (isset($data['current']) && isset($data['pool'])) {
-                $data = $data['current'];
+                $data = $data['current'] + $data['pool'];
             } else {
                 throw new SerializerException("Pool expected, but array passed");
             }
