@@ -68,6 +68,8 @@ class IdTest extends TestCase
         $this->assertTrue($this->permanent->isEqual($id));
         $this->assertTrue($this->permanent->isEqual(1));
         $this->assertTrue($this->permanent->isEqual($modelPermanent));
+        $this->assertTrue($modelTemp->id()->isEqual($modelTemp));
+        $this->assertFalse((new Id())->isEqual($modelTemp));
         $this->assertFalse($this->permanent->isEqual($this->temp));
         $this->assertFalse($this->permanent->isEqual(2));
         $this->assertFalse($this->permanent->isEqual($modelTemp));

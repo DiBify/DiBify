@@ -66,7 +66,11 @@ class Id implements JsonSerializable
         if ($modelOrId instanceof ModelInterface) {
             /** @var Id $id */
             $id = $modelOrId->id();
-            return (string) $id === (string) $this;
+            if ($id->isAssigned()) {
+                return (string) $id === (string) $this;
+            } else {
+                return $id === $this;
+            }
         }
 
         if (is_scalar($modelOrId)) {
