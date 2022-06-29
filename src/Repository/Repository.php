@@ -68,7 +68,7 @@ abstract class Repository
     public function findByIds($ids): array
     {
         $storage = $this->replicator->getPrimary();
-        $array = $storage->findByIds(IdHelper::scalarizeMany($ids));
+        $array = $storage->findByIds(IdHelper::scalarizeMany(...$ids));
         return $this->populateMany($array);
     }
 
@@ -82,7 +82,7 @@ abstract class Repository
     public function refresh(ModelInterface ...$models): SplObjectStorage
     {
         $map = new SplObjectStorage();
-        $models = ModelHelper::indexById($models);
+        $models = ModelHelper::indexById(...$models);
         $storage = $this->replicator->getPrimary();
         $storageDataArray = $storage->findByIds(array_keys($models));
         foreach ($storageDataArray as $id => $storageData) {
@@ -198,7 +198,7 @@ abstract class Repository
      * @throws DuplicateModelException
      * @throws NotPermanentIdException
      */
-    protected function register(ModelInterface $model, $refresh = false): void
+    protected function register(ModelInterface $model, bool $refresh = false): void
     {
         if (!$model->id()->isAssigned()) {
             throw new NotPermanentIdException('Model without permanent id can not be registered');
