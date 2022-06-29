@@ -4,8 +4,7 @@
 namespace DiBify\DiBify\Locker;
 
 
-use DiBify\DiBify\Exceptions\InvalidArgumentException;
-use DiBify\DiBify\Model\Reference;
+use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Model\ModelInterface;
 use SplObjectStorage;
 
@@ -25,21 +24,21 @@ class DummyLocker implements LockerInterface
         $this->defaultTimeout = $defaultTimeout;
     }
 
-    public function lock(ModelInterface $model, ModelInterface $locker, int $timeout = null): bool
+    public function lock(ModelInterface $model, Lock $lock): bool
     {
-        $locked = $this->isLockedFor($model, $locker);
+        $locked = $this->isLockedFor($model, $lock);
         if ($locked) {
             return false;
         }
 
-        $this->lockModel($model, $locker, $timeout);
+        $this->lockModel($model, $lock);
 
         return true;
     }
 
-    public function unlock(ModelInterface $model, ModelInterface $locker): bool
+    public function unlock(ModelInterface $model, Lock $lock): bool
     {
-        $locked = $this->isLockedFor($model, $locker);
+        $locked = $this->isLockedFor($model, $lock);
         if ($locked) {
             return false;
         }
@@ -48,18 +47,18 @@ class DummyLocker implements LockerInterface
         return true;
     }
 
-    public function passLock(ModelInterface $model, ModelInterface $currentLocker, ModelInterface $nextLocker, int $timeout = null): bool
+    public function passLock(ModelInterface $model, Lock $currentLock, Lock $lock): bool
     {
-        $locked = $this->isLockedFor($model, $currentLocker);
+        $locked = $this->isLockedFor($model, $currentLock);
         if ($locked) {
             return false;
         }
 
-        $this->lockModel($model, $nextLocker, $timeout);
+        $this->lockModel($model, $lock);
         return true;
     }
 
-    public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool
+    public function isLockedFor(ModelInterface $model, Lock $lock): bool
     {
         if (!isset($this->locks[$model])) {
             return false;
@@ -72,39 +71,29 @@ class DummyLocker implements LockerInterface
             return false;
         }
 
-        $currentLocker = $data[0];
-        return $currentLocker !== $locker;
+        /** @var Lock $lock */
+        $current = $data[0];
+
+        return !$lock->isCompatible($current);
     }
 
-    /**
-     * @inheritDoc
-     * @throws InvalidArgumentException
-     */
-    public function getLocker($modelOrReference): ?Reference
+    public function getLock(ModelInterface $model): ?Lock
     {
-        $reference = null;
-        if ($modelOrReference instanceof ModelInterface) {
-            $reference = Reference::to($modelOrReference);
-        }
+        $data = $this->locks[$model] ?? null;
 
-        if ($modelOrReference instanceof Reference) {
-            $reference = $modelOrReference;
-        }
-
-        if (!is_null($reference)) {
-            $model = $reference->getModel();
-            if (isset($this->locks[$model])) {
-                $data = $this->locks[$model];
-                if (time() > $data[1]) {
-                    $this->unlockModel($model);
-                    return null;
-                }
-                return Reference::to($data[0]);
-            }
+        if (is_null($data)) {
             return null;
         }
 
-        throw new InvalidArgumentException("Locker can be resolved by model or reference");
+        /** @var Lock $lock */
+        $lock = $data[0];
+
+        if (time() > $data[1]) {
+            $this->unlockModel($model);
+            return null;
+        }
+
+        return $lock->setTimeout(time() - $data[1]);
     }
 
     public function getDefaultTimeout(): int
@@ -122,15 +111,11 @@ class DummyLocker implements LockerInterface
         $this->onUnlockHandlers[] = $handler;
     }
 
-    private function lockModel(ModelInterface $model, ModelInterface $locker, int $timeout = null): void
+    private function lockModel(ModelInterface $model, Lock $lock): void
     {
-        if (is_null($timeout)) {
-            $timeout = $this->getDefaultTimeout();
-        }
-
-        $this->locks[$model] = [$locker, time() + $timeout];
+        $this->locks[$model] = [$lock, time() + ($lock->getTimeout() ?? $this->defaultTimeout)];
         foreach ($this->onLockHandlers as $onLockHandler) {
-            $onLockHandler($model, $locker);
+            $onLockHandler($model, $lock);
         }
     }
 

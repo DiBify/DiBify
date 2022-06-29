@@ -1,64 +1,31 @@
 <?php
-
+/**
+ * Created for dibify
+ * Date: 27.04.2021
+ * @author Timur Kasumov (XAKEPEHOK)
+ */
 
 namespace DiBify\DiBify\Locker;
 
 
+use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Model\ModelInterface;
-use DiBify\DiBify\Model\Reference;
 
 interface LockerInterface
 {
 
-    /**
-     * @param ModelInterface $model
-     * @param ModelInterface $locker
-     * @param int|null $timeout
-     * @return bool
-     */
-    public function lock(ModelInterface $model, ModelInterface $locker, int $timeout = null): bool;
+    public function lock(ModelInterface $model, Lock $lock): bool;
 
-    /**
-     * @param ModelInterface $model
-     * @param ModelInterface $locker
-     * @return bool
-     */
-    public function unlock(ModelInterface $model, ModelInterface $locker): bool;
+    public function unlock(ModelInterface $model, Lock $lock): bool;
 
-    /**
-     * @param ModelInterface $model
-     * @param ModelInterface $currentLocker
-     * @param ModelInterface $nextLocker
-     * @param int|null $timeout
-     * @return bool
-     */
-    public function passLock(ModelInterface $model, ModelInterface $currentLocker, ModelInterface $nextLocker, int $timeout = null): bool;
+    public function passLock(ModelInterface $model, Lock $currentLock, Lock $lock): bool;
 
-    /**
-     * @param ModelInterface[] $models
-     * @param ModelInterface $locker
-     * @param int $waitTimeout
-     * @param int|null $lockTimeout
-     * @return bool
-     */
-    public function waitForLock(array $models, ModelInterface $locker, int $waitTimeout, int $lockTimeout = null): bool;
+    public function waitForLock(array $models, int $waitTimeout, Lock $lock): bool;
 
-    /**
-     * @param ModelInterface $model
-     * @param ModelInterface $locker
-     * @return bool
-     */
-    public function isLockedFor(ModelInterface $model, ModelInterface $locker): bool;
+    public function isLockedFor(ModelInterface $model, Lock $lock): bool;
 
-    /**
-     * @param ModelInterface|Reference $modelOrReference
-     * @return Reference|null
-     */
-    public function getLocker($modelOrReference): ?Reference;
+    public function getLock(ModelInterface $model): ?Lock;
 
-    /**
-     * @return int
-     */
     public function getDefaultTimeout(): int;
 
 }

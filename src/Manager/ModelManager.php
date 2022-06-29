@@ -42,7 +42,7 @@ class ModelManager
     /** @var callable */
     private $onCommitException;
 
-    private static $instance;
+    private static self $instance;
 
     public function __construct(
         ConfigManager $configManager,
@@ -274,17 +274,16 @@ class ModelManager
      */
     protected function lock(array $models, ?Lock $lock): void
     {
-        if ($lock) {
-            $locker = $this->getLocker();
-            foreach ($models as $model) {
+        $locker = $this->getLocker();
+        foreach ($models as $model) {
+            $currentLock = $locker->getLock($model);
 
-                if ($locker->isLockedFor($model, $lock->getLocker())) {
-                    throw new LockedModelException('Model locked by somebody else');
-                }
+            if ($currentLock && !$lock) {
+                throw new LockedModelException('Model locked by somebody else');
+            }
 
-                if ($locker->getLocker($model) === null) {
-                    $locker->lock($model, $lock->getLocker(), $lock->getTimeout());
-                }
+            if ($lock && !$locker->lock($model, $lock)) {
+                throw new LockedModelException('Model locked by somebody else');
             }
         }
     }
@@ -297,7 +296,7 @@ class ModelManager
     {
         if ($lock) {
             foreach ($models as $model) {
-                $this->getLocker()->unlock($model, $lock->getLocker());
+                $this->getLocker()->unlock($model, $lock);
             }
         }
     }

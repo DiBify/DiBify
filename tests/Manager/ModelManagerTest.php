@@ -75,12 +75,12 @@ class ModelManagerTest extends TestCase
         );
     }
 
-    public function testGetLocker()
+    public function testGetLocker(): void
     {
         $this->assertSame($this->locker, $this->manager->getLocker());
     }
 
-    public function testGetRepository()
+    public function testGetRepository(): void
     {
         $this->assertSame(
             $this->repo_1,
@@ -93,14 +93,14 @@ class ModelManagerTest extends TestCase
         );
     }
 
-    public function testFindByReference()
+    public function testFindByReference(): void
     {
         $reference = Reference::create(TestModel_1::getModelAlias(), 2);
         $model = $this->manager->findByReference($reference);
         $this->assertTrue($reference->isFor($model));
     }
 
-    public function testFindByReferences()
+    public function testFindByReferences(): void
     {
         $reference_1 = Reference::create(TestModel_1::getModelAlias(), 1);
         $reference_2 = Reference::create(TestModel_2::getModelAlias(), 2);
@@ -110,7 +110,7 @@ class ModelManagerTest extends TestCase
         $this->assertTrue($reference_2->isFor($storage[$reference_2]));
     }
 
-    public function testFindByAnyTypeId()
+    public function testFindByAnyTypeId(): void
     {
         $model = new TestModel_1(10);
         $this->assertSame(
@@ -138,7 +138,7 @@ class ModelManagerTest extends TestCase
 
     //todo public function testRefreshMany(): void
 
-    public function testCommitWithServiceUnlock()
+    public function testCommitWithServiceUnlock(): void
     {
         $lockedBy = new TestModel_1(1);
         $lock = new ServiceLock($lockedBy, 3);
@@ -166,16 +166,16 @@ class ModelManagerTest extends TestCase
         $this->assertNull($this->repo_1->findById(3));
 
         $locker = $this->manager->getLocker();
-        $this->assertNull($locker->getLocker($model_1));
-        $this->assertNull($locker->getLocker($model_2));
-        $this->assertNull($locker->getLocker($model_3));
+        $this->assertNull($locker->getLock($model_1));
+        $this->assertNull($locker->getLock($model_2));
+        $this->assertNull($locker->getLock($model_3));
 
         $this->assertSame($transaction, $this->onEvents['before'] ?? null);
         $this->assertSame($transaction, $this->onEvents['after'] ?? null);
         $this->assertArrayNotHasKey('exception', $this->onEvents);
     }
 
-    public function testCommitWithServiceLockException()
+    public function testCommitWithServiceLockException(): void
     {
         $lockedBy = new TestModel_1(1);
         $lock = new ServiceLock($lockedBy, 3);
@@ -188,14 +188,14 @@ class ModelManagerTest extends TestCase
         }
 
         $locker = $this->manager->getLocker();
-        $this->assertNull($locker->getLocker($model));
+        $this->assertNull($locker->getLock($model));
 
         $this->assertInstanceOf(Transaction::class, $this->onEvents['before'] ?? null);
         $this->assertInstanceOf(Transaction::class, $this->onEvents['exception'] ?? null);
         $this->assertArrayNotHasKey('after', $this->onEvents);
     }
 
-    public function testCommitWithLock()
+    public function testCommitWithLock(): void
     {
         $lockedBy = new TestModel_1(1);
         $lock = new Lock($lockedBy, 2);
@@ -204,10 +204,10 @@ class ModelManagerTest extends TestCase
         $this->manager->commit(new Transaction([$model]), $lock);
 
         $locker = $this->manager->getLocker();
-        $this->assertTrue($locker->getLocker($model)->isFor($lockedBy));
+        $this->assertTrue($locker->getLock($model)->isCompatible($lock));
     }
 
-    public function testCommitWithLockException()
+    public function testCommitWithLockException(): void
     {
         $lockedBy = new TestModel_1(1);
         $lock = new Lock($lockedBy, 2);
@@ -221,10 +221,10 @@ class ModelManagerTest extends TestCase
         }
 
         $locker = $this->manager->getLocker();
-        $this->assertTrue($locker->getLocker($model)->isFor($lockedBy));
+        $this->assertTrue($locker->getLock($model)->isCompatible($lock));
     }
 
-    public function testCommitWithLockedModelException()
+    public function testCommitWithLockedModelException(): void
     {
         $this->expectException(LockedModelException::class);
 
@@ -232,12 +232,20 @@ class ModelManagerTest extends TestCase
         $lock = new Lock($lockedBy, 2);
         $model = new TestModel_2(2);
 
-        $this->manager->getLocker()->lock($model, new TestModel_1(11));
+        $this->manager->getLocker()->lock($model, new Lock(new TestModel_1(11)));
 
         $this->manager->commit(new Transaction([$model]), $lock);
     }
 
-    public function testCommitModelEvents()
+    public function testCommitWithLockedModelExceptionButWithoutLock(): void
+    {
+        $this->expectException(LockedModelException::class);
+        $model = new TestModel_2(2);
+        $this->manager->getLocker()->lock($model, new Lock(new TestModel_1(11)));
+        $this->manager->commit(new Transaction([$model]));
+    }
+
+    public function testCommitModelEvents(): void
     {
         $model = new TestModel_1();
 
@@ -256,7 +264,7 @@ class ModelManagerTest extends TestCase
         $this->assertTrue($model->onAfterCommit);
     }
 
-    public function testFreeUpMemory()
+    public function testFreeUpMemory(): void
     {
         $repo = $this->manager->getRepository(TestModel_1::class);
         $repo->findById(1);

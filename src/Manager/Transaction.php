@@ -21,6 +21,9 @@ class Transaction
     /** @var ModelInterface[] */
     protected array $deleted = [];
 
+    /** @var ModelInterface[] */
+    protected array $foreignKeyModels = [];
+
     protected array $metadata = [];
 
     /**
@@ -29,11 +32,12 @@ class Transaction
      * @param ModelInterface[] $deleted
      * @throws Exception
      */
-    public function __construct(array $persisted = [], array $deleted = [])
+    public function __construct(array $persisted = [], array $deleted = [], array $foreignKeyModels = [])
     {
         $this->id = new Id(UuidGenerator::generate());
         $this->persists(...$persisted);
         $this->delete(...$deleted);
+        $this->addForeignKeyModels(...$foreignKeyModels);
     }
 
     public function id(): Id
@@ -123,6 +127,35 @@ class Transaction
     }
 
     public function resetDeleted(): void
+    {
+        $this->deleted = [];
+    }
+
+    /**
+     * @return ModelInterface[]
+     */
+    public function getForeignKeyModels(string $modelClass = null): array
+    {
+        return $this->filter($this->foreignKeyModels, $modelClass);
+    }
+
+    public function addForeignKeyModels(ModelInterface ...$models): void
+    {
+        foreach ($models as $model) {
+            $hash = spl_object_hash($model);
+            $this->foreignKeyModels[$hash] = $model;
+        }
+    }
+
+    public function removeForeignKeyModels(ModelInterface ...$models): void
+    {
+        foreach ($models as $model) {
+            $hash = spl_object_hash($model);
+            unset($this->foreignKeyModels[$hash]);
+        }
+    }
+
+    public function resetForeignKeyModels(): void
     {
         $this->deleted = [];
     }
