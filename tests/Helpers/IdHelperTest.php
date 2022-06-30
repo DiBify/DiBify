@@ -22,7 +22,6 @@ class IdHelperTest extends TestCase
             [Reference::create('model', 2), '2'],
             [new Id(3), '3'],
             [4, '4'],
-            [null, null],
         ];
     }
 
@@ -48,7 +47,7 @@ class IdHelperTest extends TestCase
     {
         $this->assertSame(
             [$output],
-            IdHelper::scalarizeMany([$input])
+            IdHelper::scalarizeMany(...([$input]))
         );
     }
 }

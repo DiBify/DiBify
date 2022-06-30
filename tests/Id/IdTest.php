@@ -7,17 +7,16 @@
 namespace DiBify\DiBify\Id;
 
 
-use DiBify\DiBify\Model\ModelInterface;
+use DiBify\DiBify\Mock\TestModel_1;
+use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
 
 class IdTest extends TestCase
 {
 
-    /** @var Id */
-    private $permanent;
+    private Id $permanent;
 
-    /** @var Id */
-    private $temp;
+    private Id $temp;
 
     protected function setUp(): void
     {
@@ -25,12 +24,12 @@ class IdTest extends TestCase
         $this->temp = new Id();
     }
 
-    public function testConstructWithoutPermanent()
+    public function testConstructWithoutPermanent(): void
     {
         $this->assertFalse($this->temp->isAssigned());
     }
 
-    public function testConstructWithPermanent()
+    public function testConstructWithPermanent(): void
     {
         $this->assertTrue($this->permanent->isAssigned());
     }
@@ -57,11 +56,14 @@ class IdTest extends TestCase
 
     public function testIsEqual()
     {
-        $modelPermanent = $this->createMock(ModelInterface::class);
-        $modelPermanent->method('id')->willReturn($this->permanent);
+        $modelPermanent = new TestModel_1();
+        $modelPermanent->id = $this->permanent;
 
-        $modelTemp = $this->createMock(ModelInterface::class);
-        $modelTemp->method('id')->willReturn($this->temp);
+        $modelTemp = new TestModel_1();
+        $modelTemp->id = $this->temp;
+
+        $referencePermanent = Reference::to($modelPermanent);
+        $referenceTemp = Reference::to($modelTemp);
 
         $id = new Id(1);
 
@@ -69,13 +71,14 @@ class IdTest extends TestCase
         $this->assertTrue($this->permanent->isEqual(1));
         $this->assertTrue($this->permanent->isEqual($modelPermanent));
         $this->assertTrue($modelTemp->id()->isEqual($modelTemp));
+        $this->assertTrue($this->permanent->isEqual($referencePermanent));
+        $this->assertTrue($this->temp->isEqual($referenceTemp));
         $this->assertFalse((new Id())->isEqual($modelTemp));
         $this->assertFalse($this->permanent->isEqual($this->temp));
         $this->assertFalse($this->permanent->isEqual(2));
         $this->assertFalse($this->permanent->isEqual($modelTemp));
-
-        /** @noinspection PhpParamsInspection */
-        $this->assertFalse($this->permanent->isEqual([]));
+        $this->assertFalse($this->permanent->isEqual($referenceTemp));
+        $this->assertFalse($this->temp->isEqual($referencePermanent));
     }
     
     public function testToString()

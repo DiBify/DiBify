@@ -121,12 +121,6 @@ class ConfigManagerTest extends TestCase
         $this->assertSame(1, $this->callableCount[TestModel_2::class]);
     }
 
-    public function testGetRepositoryInvalidArgument()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->manager->getRepository($this);
-    }
-
     public function testGetRepositoryUnknownModel()
     {
         $this->expectException(UnknownModelException::class);
@@ -163,12 +157,6 @@ class ConfigManagerTest extends TestCase
             $this->{'idGenerator_' . $generatorNumber},
             $this->manager->getIdGenerator($argument)
         );
-    }
-
-    public function testGetIdGeneratorInvalidArgument()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->manager->getIdGenerator($this);
     }
 
     public function testGetIdGeneratorUnknownModel()

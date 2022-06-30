@@ -77,7 +77,7 @@ final class Reference implements JsonSerializable
         return $this->model;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'alias' => $this->alias,

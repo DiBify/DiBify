@@ -22,7 +22,7 @@ class ConfigManager
 
     protected array $aliasToClass;
 
-    public function add($repoOrCallable, array $modelClasses, IdGeneratorInterface $idGenerator)
+    public function add(Repository|callable $repoOrCallable, array $modelClasses, IdGeneratorInterface $idGenerator)
     {
         foreach ($modelClasses as $class) {
             /** @var ModelInterface|string $class */
@@ -38,7 +38,7 @@ class ConfigManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function getRepository($anyModelPointer): Repository
+    public function getRepository(ModelInterface|Reference|string $anyModelPointer): Repository
     {
         $class = $this->getClass($anyModelPointer);
         $repo = $this->classToRepo[$class];
@@ -56,7 +56,7 @@ class ConfigManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function getIdGenerator($anyModelPointer): IdGeneratorInterface
+    public function getIdGenerator(ModelInterface|Reference|string $anyModelPointer): IdGeneratorInterface
     {
         $class = $this->getClass($anyModelPointer);
         return $this->classToIdGenerator[$class];
@@ -68,7 +68,7 @@ class ConfigManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    protected function getClass($anyModelPointer): string
+    protected function getClass(ModelInterface|Reference|string $anyModelPointer): string
     {
         if ($anyModelPointer instanceof ModelInterface) {
             return get_class($anyModelPointer);

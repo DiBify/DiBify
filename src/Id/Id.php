@@ -8,6 +8,7 @@ namespace DiBify\DiBify\Id;
 
 
 use DiBify\DiBify\Model\ModelInterface;
+use DiBify\DiBify\Model\Reference;
 use JsonSerializable;
 
 class Id implements JsonSerializable
@@ -53,7 +54,7 @@ class Id implements JsonSerializable
      * @param Id | ModelInterface | int | string $modelOrId
      * @return bool
      */
-    public function isEqual($modelOrId): bool
+    public function isEqual(ModelInterface|Reference|Id|string|int $modelOrId): bool
     {
         if ($modelOrId instanceof self) {
             if ($this->isAssigned()) {
@@ -63,7 +64,7 @@ class Id implements JsonSerializable
             }
         }
 
-        if ($modelOrId instanceof ModelInterface) {
+        if ($modelOrId instanceof ModelInterface || $modelOrId instanceof Reference) {
             /** @var Id $id */
             $id = $modelOrId->id();
             if ($id->isAssigned()) {

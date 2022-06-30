@@ -21,14 +21,9 @@ class Lock implements JsonSerializable
 
     private ?int $timeout;
 
-    /**
-     * @param ModelInterface|Reference $lockerModelOrReference
-     * @param string|null $identity
-     * @param int|null $timeout
-     */
-    public function __construct($lockerModelOrReference, string $identity = null, int $timeout = null)
+    public function __construct(ModelInterface|Reference $locker, string $identity = null, int $timeout = null)
     {
-        $this->locker = $lockerModelOrReference instanceof ModelInterface ? Reference::to($lockerModelOrReference) : $lockerModelOrReference;
+        $this->locker = $locker instanceof ModelInterface ? Reference::to($locker) : $locker;
         $this->timeout = $timeout;
         $this->identity = $identity;
     }

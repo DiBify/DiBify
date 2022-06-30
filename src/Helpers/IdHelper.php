@@ -11,11 +11,7 @@ use DiBify\DiBify\Model\ModelInterface;
 class IdHelper
 {
 
-    /**
-     * @param ModelInterface|Reference|Id|string|int $modelOrId
-     * @return string|null
-     */
-    public static function scalarizeOne($modelOrId): ?string
+    public static function scalarizeOne(ModelInterface|Reference|Id|string|int $modelOrId): ?string
     {
         if ($modelOrId instanceof ModelInterface) {
             return (string) $modelOrId->id();
@@ -32,11 +28,7 @@ class IdHelper
         return $modelOrId;
     }
 
-    /**
-     * @param ModelInterface[]|Reference[]|Id[]|string[]|int[] $modelsOrIds
-     * @return string[]|null[]
-     */
-    public static function scalarizeMany(array $modelsOrIds): array
+    public static function scalarizeMany(ModelInterface|Reference|Id|string|int ...$modelsOrIds): array
     {
         $result = [];
         foreach ($modelsOrIds as $modelOrId) {

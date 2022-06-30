@@ -26,7 +26,7 @@ class ModelHelperTest extends TestCase
             new TestModel_3(3),
         ];
 
-        $indexed = ModelHelper::indexById($models);
+        $indexed = ModelHelper::indexById(...$models);
         $this->assertCount(4, $indexed);
 
         foreach ($indexed as $id => $model) {
@@ -37,17 +37,17 @@ class ModelHelperTest extends TestCase
     public function testIndexByIdWithNonPermanentId()
     {
         $this->expectException(NotPermanentIdException::class);
-        ModelHelper::indexById([
+        ModelHelper::indexById(...([
             new TestModel_1()
-        ]);
+        ]));
     }
 
     public function testIndexByIdWithDuplicateId()
     {
         $this->expectException(DuplicateModelException::class);
-        ModelHelper::indexById([
+        ModelHelper::indexById(...([
             new TestModel_1(1),
             new TestModel_1(1),
-        ]);
+        ]));
     }
 }
