@@ -66,7 +66,7 @@ class ModelManagerTest extends TestCase
 
         $this->onEvents = [];
 
-        $this->manager = new ModelManager(
+        $this->manager = ModelManager::construct(
             $configManager,
             $this->locker,
             function (Transaction $commit) {$this->onEvents['before'] = $commit;},

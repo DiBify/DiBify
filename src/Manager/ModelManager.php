@@ -44,12 +44,12 @@ class ModelManager
 
     private static self $instance;
 
-    public function __construct(
+    private function __construct(
         ConfigManager $configManager,
         LockerInterface $locker,
-        callable $onBeforeCommit = null,
-        callable $onAfterCommit = null,
-        callable $onCommitException = null
+        callable $onBeforeCommit,
+        callable $onAfterCommit,
+        callable $onCommitException
     )
     {
         $this->configManager = $configManager;
@@ -58,8 +58,24 @@ class ModelManager
         $this->onBeforeCommit = $onBeforeCommit ?? function () {};
         $this->onAfterCommit = $onAfterCommit ?? function () {};
         $this->onCommitException = $onCommitException ?? function () {};
+    }
 
-        static::$instance = $this;
+    public static function construct(
+        ConfigManager $configManager,
+        LockerInterface $locker,
+        callable $onBeforeCommit = null,
+        callable $onAfterCommit = null,
+        callable $onCommitException = null
+    ): self
+    {
+        static::$instance = new self(
+            $configManager,
+            $locker,
+            $onBeforeCommit,
+            $onAfterCommit,
+            $onCommitException
+        );
+        return static::$instance;
     }
 
     public function getLocker(): LockerInterface
@@ -68,12 +84,12 @@ class ModelManager
     }
 
     /**
-     * @param $modelObjectOrClassOrAlias
+     * @param ModelInterface|Reference|string $modelObjectOrClassOrAlias
      * @return Repository
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function getRepository($modelObjectOrClassOrAlias): Repository
+    public function getRepository(ModelInterface|Reference|string $modelObjectOrClassOrAlias): Repository
     {
         $repo = $this->configManager->getRepository($modelObjectOrClassOrAlias);
         $this->repositories[get_class($repo)] = $repo;
@@ -127,7 +143,7 @@ class ModelManager
      * @throws InvalidArgumentException
      * @throws UnknownModelException
      */
-    public function findByAnyTypeId($argument, string $modelAliasOrClass = null): ?ModelInterface
+    public function findByAnyTypeId(ModelInterface|Reference|Id|string|int $argument, string $modelAliasOrClass = null): ?ModelInterface
     {
         if ($argument instanceof ModelInterface) {
             return $argument;
