@@ -47,9 +47,9 @@ class ModelManager
     private function __construct(
         ConfigManager $configManager,
         LockerInterface $locker,
-        callable $onBeforeCommit,
-        callable $onAfterCommit,
-        callable $onCommitException
+        ?callable $onBeforeCommit,
+        ?callable $onAfterCommit,
+        ?callable $onCommitException
     )
     {
         $this->configManager = $configManager;
