@@ -43,6 +43,7 @@ class TransactionTest extends TestCase
             new TestModel_3(),
         ];
 
+        Transaction::freeUpMemory();
         $this->transaction = new Transaction($this->persisted, $this->deleted);
     }
 
@@ -164,6 +165,19 @@ class TransactionTest extends TestCase
         $this->assertFalse($this->transaction->isPersisted($model_3));
     }
 
+    public function testIsPersistsWith(): void
+    {
+        $primary = $this->deleted[0];
+        $secondary = $this->deleted[1];
+        $this->assertFalse(Transaction::isPersistsWith($primary, $secondary));
+
+        Transaction::persistsWith($primary, $secondary);
+        $this->assertTrue(Transaction::isPersistsWith($primary, $secondary));
+
+        Transaction::freeUpMemory();
+        $this->assertFalse(Transaction::isPersistsWith($primary, $secondary));
+    }
+
     public function testWithPersistsDelete(): void
     {
         $model = $this->deleted[0];
@@ -196,6 +210,19 @@ class TransactionTest extends TestCase
         $this->assertTrue($this->transaction->isPersisted($model));
         $this->assertTrue($this->transaction->isPersisted($shouldBeDeleted_1));
         $this->assertTrue($this->transaction->isPersisted($shouldBeDeleted_2));
+    }
+
+    public function testIsWithPersistsDelete(): void
+    {
+        $primary = $this->deleted[0];
+        $secondary = $this->persisted[1];
+        $this->assertFalse(Transaction::isWithPersistsDelete($primary, $secondary));
+
+        Transaction::withPersistsDelete($primary, $secondary);
+        $this->assertTrue(Transaction::isWithPersistsDelete($primary, $secondary));
+
+        Transaction::freeUpMemory();
+        $this->assertFalse(Transaction::isWithPersistsDelete($primary, $secondary));
     }
 
     public function testGetDeleted(): void
@@ -269,6 +296,19 @@ class TransactionTest extends TestCase
         $this->assertFalse($this->transaction->isDeleted($model_3));
     }
 
+    public function testIsDeleteWith(): void
+    {
+        $primary = $this->persisted[0];
+        $secondary = $this->persisted[1];
+        $this->assertFalse(Transaction::isDeleteWith($primary, $secondary));
+
+        Transaction::deleteWith($primary, $secondary);
+        $this->assertTrue(Transaction::isDeleteWith($primary, $secondary));
+
+        Transaction::freeUpMemory();
+        $this->assertFalse(Transaction::isDeleteWith($primary, $secondary));
+    }
+
     public function testWithDeletePersists(): void
     {
         $model = $this->persisted[0];
@@ -301,6 +341,19 @@ class TransactionTest extends TestCase
         $this->assertTrue($this->transaction->isDeleted($model));
         $this->assertTrue($this->transaction->isDeleted($shouldBePersisted_1));
         $this->assertTrue($this->transaction->isDeleted($shouldBePersisted_2));
+    }
+
+    public function testIsWithDeletePersists(): void
+    {
+        $primary = $this->persisted[0];
+        $secondary = $this->deleted[1];
+        $this->assertFalse(Transaction::isWithDeletePersists($primary, $secondary));
+
+        Transaction::withDeletePersists($primary, $secondary);
+        $this->assertTrue(Transaction::isWithDeletePersists($primary, $secondary));
+
+        Transaction::freeUpMemory();
+        $this->assertFalse(Transaction::isWithDeletePersists($primary, $secondary));
     }
 
     public function testFreeUpMemory(): void

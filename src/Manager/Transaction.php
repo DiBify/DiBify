@@ -203,42 +203,66 @@ class Transaction
         }));
     }
 
-    public static function persistsWith(ModelInterface $model, ModelInterface ...$models): void
+    public static function persistsWith(ModelInterface $primary, ModelInterface ...$models): void
     {
         if (!isset(self::$persistsWith)) {
             self::$persistsWith = new SplObjectStorage();
         }
-        self::together(self::$persistsWith, $model, ...$models);
+        self::together(self::$persistsWith, $primary, ...$models);
     }
 
-    public static function deleteWith(ModelInterface $model, ModelInterface ...$models): void
+    public static function isPersistsWith(ModelInterface $primary, ModelInterface $secondary): bool
+    {
+        $models = self::$persistsWith[$primary] ?? [];
+        return in_array($secondary, $models, true);
+    }
+
+    public static function deleteWith(ModelInterface $primary, ModelInterface ...$models): void
     {
         if (!isset(self::$deleteWith)) {
             self::$deleteWith = new SplObjectStorage();
         }
-        self::together(self::$deleteWith, $model, ...$models);
+        self::together(self::$deleteWith, $primary, ...$models);
     }
 
-    public static function withDeletePersists(ModelInterface $model, ModelInterface ...$models): void
+    public static function isDeleteWith(ModelInterface $primary, ModelInterface $secondary): bool
+    {
+        $models = self::$deleteWith[$primary] ?? [];
+        return in_array($secondary, $models, true);
+    }
+
+    public static function withDeletePersists(ModelInterface $primary, ModelInterface ...$models): void
     {
         if (!isset(self::$withDeletePersists)) {
             self::$withDeletePersists = new SplObjectStorage();
         }
-        self::together(self::$withDeletePersists, $model, ...$models);
+        self::together(self::$withDeletePersists, $primary, ...$models);
     }
 
-    public static function withPersistsDelete(ModelInterface $model, ModelInterface ...$models): void
+    public static function isWithDeletePersists(ModelInterface $primary, ModelInterface $secondary): bool
+    {
+        $models = self::$withDeletePersists[$primary] ?? [];
+        return in_array($secondary, $models, true);
+    }
+
+    public static function withPersistsDelete(ModelInterface $primary, ModelInterface ...$models): void
     {
         if (!isset(self::$withPersistsDelete)) {
             self::$withPersistsDelete = new SplObjectStorage();
         }
-        self::together(self::$withPersistsDelete, $model, ...$models);
+        self::together(self::$withPersistsDelete, $primary, ...$models);
     }
 
-    private static function together(SplObjectStorage $map, ModelInterface $model, ModelInterface ...$models): void
+    public static function isWithPersistsDelete(ModelInterface $primary, ModelInterface $secondary): bool
     {
-        $current = $map[$model] ?? [];
-        $map[$model] = array_merge($current, $models);
+        $models = self::$withPersistsDelete[$primary] ?? [];
+        return in_array($secondary, $models, true);
+    }
+
+    private static function together(SplObjectStorage $map, ModelInterface $primary, ModelInterface ...$models): void
+    {
+        $current = $map[$primary] ?? [];
+        $map[$primary] = array_merge($current, $models);
     }
 
     public static function freeUpMemory(): void
