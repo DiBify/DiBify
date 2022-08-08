@@ -272,6 +272,7 @@ class ModelManager
     public function freeUpMemory(): void
     {
         Reference::freeUpMemory();
+        Transaction::freeUpMemory();
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }

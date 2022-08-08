@@ -10,6 +10,7 @@ use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Id\UuidGenerator;
 use DiBify\DiBify\Model\ModelInterface;
 use Exception;
+use SplObjectStorage;
 
 class Transaction
 {
@@ -23,6 +24,14 @@ class Transaction
 
     protected array $metadata = [];
 
+    private static SplObjectStorage $persistsWith;
+
+    private static SplObjectStorage $deleteWith;
+
+    private static SplObjectStorage $withDeletePersists;
+
+    private static SplObjectStorage $withPersistsDelete;
+
     /**
      * Commit constructor.
      * @param ModelInterface[] $persisted
@@ -31,6 +40,22 @@ class Transaction
      */
     public function __construct(array $persisted = [], array $deleted = [])
     {
+        if (!isset(self::$persistsWith)) {
+            self::$persistsWith = new SplObjectStorage();
+        }
+
+        if (!isset(self::$deleteWith)) {
+            self::$deleteWith = new SplObjectStorage();
+        }
+
+        if (!isset(self::$withDeletePersists)) {
+            self::$withDeletePersists = new SplObjectStorage();
+        }
+
+        if (!isset(self::$withPersistsDelete)) {
+            self::$withPersistsDelete = new SplObjectStorage();
+        }
+
         $this->id = new Id(UuidGenerator::generate());
         $this->persists(...$persisted);
         $this->delete(...$deleted);
@@ -70,6 +95,18 @@ class Transaction
             $hash = spl_object_hash($model);
             $this->persisted[$hash] = $model;
             unset($this->deleted[$hash]);
+
+            foreach (self::$persistsWith[$model] ?? [] as $linkedModel) {
+                $this->persists($linkedModel);
+            }
+
+            unset(self::$persistsWith[$model]);
+
+            foreach (self::$withPersistsDelete[$model] ?? [] as $linkedModel) {
+                $this->delete($linkedModel);
+            }
+
+            unset(self::$withPersistsDelete[$model]);
         }
     }
 
@@ -119,6 +156,18 @@ class Transaction
             $hash = spl_object_hash($model);
             $this->deleted[$hash] = $model;
             unset($this->persisted[$hash]);
+
+            foreach (self::$deleteWith[$model] ?? [] as $linkedModel) {
+                $this->delete($linkedModel);
+            }
+
+            unset(self::$deleteWith[$model]);
+
+            foreach (self::$withDeletePersists[$model] ?? [] as $linkedModel) {
+                $this->persists($linkedModel);
+            }
+
+            unset(self::$withDeletePersists[$model]);
         }
     }
 
@@ -152,6 +201,52 @@ class Transaction
             array_filter($models, function (ModelInterface $model) use ($modelClass) {
             return get_class($model) === $modelClass;
         }));
+    }
+
+    public static function persistsWith(ModelInterface $model, ModelInterface ...$models): void
+    {
+        if (!isset(self::$persistsWith)) {
+            self::$persistsWith = new SplObjectStorage();
+        }
+        self::together(self::$persistsWith, $model, ...$models);
+    }
+
+    public static function deleteWith(ModelInterface $model, ModelInterface ...$models): void
+    {
+        if (!isset(self::$deleteWith)) {
+            self::$deleteWith = new SplObjectStorage();
+        }
+        self::together(self::$deleteWith, $model, ...$models);
+    }
+
+    public static function withDeletePersists(ModelInterface $model, ModelInterface ...$models): void
+    {
+        if (!isset(self::$withDeletePersists)) {
+            self::$withDeletePersists = new SplObjectStorage();
+        }
+        self::together(self::$withDeletePersists, $model, ...$models);
+    }
+
+    public static function withPersistsDelete(ModelInterface $model, ModelInterface ...$models): void
+    {
+        if (!isset(self::$withPersistsDelete)) {
+            self::$withPersistsDelete = new SplObjectStorage();
+        }
+        self::together(self::$withPersistsDelete, $model, ...$models);
+    }
+
+    private static function together(SplObjectStorage $map, ModelInterface $model, ModelInterface ...$models): void
+    {
+        $current = $map[$model] ?? [];
+        $map[$model] = array_merge($current, $models);
+    }
+
+    public static function freeUpMemory(): void
+    {
+        self::$persistsWith = new SplObjectStorage();
+        self::$deleteWith = new SplObjectStorage();
+        self::$withDeletePersists = new SplObjectStorage();
+        self::$withPersistsDelete = new SplObjectStorage();
     }
 
 }
