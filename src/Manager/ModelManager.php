@@ -13,11 +13,12 @@ use DiBify\DiBify\Exceptions\ModelRefreshException;
 use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
-use DiBify\DiBify\Helpers\ReflectionHelper;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Locker\Lock\ServiceLock;
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Locker\LockerInterface;
+use DiBify\DiBify\Model\ModelAfterCommitEventInterface;
+use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Repository\Repository;
@@ -225,8 +226,8 @@ class ModelManager
 
         //onBeforeCommit
         foreach ($transaction->getPersisted() as $model) {
-            if (method_exists($model, 'onBeforeCommit')) {
-                $this->runModelEvent($model, 'onBeforeCommit');
+            if ($model instanceof ModelBeforeCommitEventInterface) {
+                $model->onBeforeCommit();
             }
         }
 
@@ -245,8 +246,8 @@ class ModelManager
 
             //onAfterCommit
             foreach ($transaction->getPersisted() as $model) {
-                if (method_exists($model, 'onAfterCommit')) {
-                    $this->runModelEvent($model, 'onAfterCommit');
+                if ($model instanceof ModelAfterCommitEventInterface) {
+                    $model->onAfterCommit();
                 }
             }
 
@@ -274,13 +275,6 @@ class ModelManager
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }
-    }
-
-    protected function runModelEvent(ModelInterface $model, string $method)
-    {
-        $method = ReflectionHelper::getMethod($model, $method);
-        $method->setAccessible(true);
-        $method->invoke($model);
     }
 
     /**

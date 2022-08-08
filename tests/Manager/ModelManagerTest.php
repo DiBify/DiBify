@@ -18,6 +18,7 @@ use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Mock\TestModel_2;
 use DiBify\DiBify\Mock\TestRepo_1;
 use DiBify\DiBify\Mock\TestRepo_2;
+use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
 use Throwable;

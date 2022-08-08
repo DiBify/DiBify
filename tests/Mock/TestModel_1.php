@@ -8,9 +8,11 @@ namespace DiBify\DiBify\Mock;
 
 
 use DiBify\DiBify\Id\Id;
+use DiBify\DiBify\Model\ModelAfterCommitEventInterface;
+use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\ModelInterface;
 
-class TestModel_1 implements ModelInterface
+class TestModel_1 implements ModelInterface, ModelBeforeCommitEventInterface, ModelAfterCommitEventInterface
 {
 
     public $id;
@@ -47,12 +49,12 @@ class TestModel_1 implements ModelInterface
         return $this->custom;
     }
 
-    protected function onBeforeCommit(): void
+    public function onBeforeCommit(): void
     {
         $this->onBeforeCommit = true;
     }
 
-    protected function onAfterCommit(): void
+    public function onAfterCommit(): void
     {
         $this->onAfterCommit = true;
     }
