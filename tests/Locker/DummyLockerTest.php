@@ -80,6 +80,10 @@ class DummyLockerTest extends TestCase
             [$this->model_2, $this->lock_2],
             [$this->model_3, $this->lock_3],
         ], array_values($locks));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(100);
+        $this->dummy->lock($this->model_1, $this->lock_2, new RuntimeException('100', 100));
     }
 
     public function testUnlock(): void
@@ -99,6 +103,10 @@ class DummyLockerTest extends TestCase
         $this->assertFalse($this->dummy->unlock($this->model_2, $this->lock_22));
 
         $this->assertSame([$this->model_1, $this->model_3], $unlocks);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(200);
+        $this->dummy->unlock($this->model_2, $this->lock_22,  new RuntimeException('200', 200));
     }
 
     public function testPassLock(): void
@@ -116,6 +124,10 @@ class DummyLockerTest extends TestCase
         $this->assertFalse($this->dummy->passLock($this->model_2, $this->lock_1, $this->lock_3));
         $this->assertTrue($this->dummy->passLock($this->model_1, $this->lock_1, $this->lock_2));
         $this->assertFalse($this->dummy->passLock($this->model_1, $this->lock_22, $this->lock_3));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(300);
+        $this->dummy->passLock($this->model_1, $this->lock_22, $this->lock_3, new RuntimeException('300', 300));
     }
 
     public function testWaitForLock(): void
@@ -142,6 +154,15 @@ class DummyLockerTest extends TestCase
                 5,
                 $this->lock_3,
             )
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(400);
+        $this->dummy->waitForLock(
+            [$this->model_1, $this->model_2, $this->model_3],
+            5,
+            $this->lock_2,
+            new RuntimeException('400', 400)
         );
     }
 

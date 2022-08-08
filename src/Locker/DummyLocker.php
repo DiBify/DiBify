@@ -7,6 +7,7 @@ namespace DiBify\DiBify\Locker;
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Model\ModelInterface;
 use SplObjectStorage;
+use Throwable;
 
 class DummyLocker implements LockerInterface
 {
@@ -24,10 +25,20 @@ class DummyLocker implements LockerInterface
         $this->defaultTimeout = $defaultTimeout;
     }
 
-    public function lock(ModelInterface $model, Lock $lock): bool
+    /**
+     * @param ModelInterface $model
+     * @param Lock $lock
+     * @param Throwable|null $throwable
+     * @return bool
+     * @throws Throwable
+     */
+    public function lock(ModelInterface $model, Lock $lock, ?Throwable $throwable = null): bool
     {
         $locked = $this->isLockedFor($model, $lock);
         if ($locked) {
+            if ($throwable) {
+                throw $throwable;
+            }
             return false;
         }
 
@@ -36,10 +47,20 @@ class DummyLocker implements LockerInterface
         return true;
     }
 
-    public function unlock(ModelInterface $model, Lock $lock): bool
+    /**
+     * @param ModelInterface $model
+     * @param Lock $lock
+     * @param Throwable|null $throwable
+     * @return bool
+     * @throws Throwable
+     */
+    public function unlock(ModelInterface $model, Lock $lock, ?Throwable $throwable = null): bool
     {
         $locked = $this->isLockedFor($model, $lock);
         if ($locked) {
+            if ($throwable) {
+                throw $throwable;
+            }
             return false;
         }
 
@@ -47,10 +68,21 @@ class DummyLocker implements LockerInterface
         return true;
     }
 
-    public function passLock(ModelInterface $model, Lock $currentLock, Lock $lock): bool
+    /**
+     * @param ModelInterface $model
+     * @param Lock $currentLock
+     * @param Lock $lock
+     * @param Throwable|null $throwable
+     * @return bool
+     * @throws Throwable
+     */
+    public function passLock(ModelInterface $model, Lock $currentLock, Lock $lock, ?Throwable $throwable = null): bool
     {
         $locked = $this->isLockedFor($model, $currentLock);
         if ($locked) {
+            if ($throwable) {
+                throw $throwable;
+            }
             return false;
         }
 

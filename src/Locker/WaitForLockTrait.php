@@ -10,11 +10,20 @@ namespace DiBify\DiBify\Locker;
 
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Model\ModelInterface;
+use Throwable;
 
 trait WaitForLockTrait
 {
 
-    public function waitForLock(array $models, int $waitTimeout, Lock $lock): bool
+    /**
+     * @param array $models
+     * @param int $waitTimeout
+     * @param Lock $lock
+     * @param Throwable|null $throwable
+     * @return bool
+     * @throws Throwable
+     */
+    public function waitForLock(array $models, int $waitTimeout, Lock $lock, ?Throwable $throwable = null): bool
     {
         $started = time();
         do {
@@ -37,14 +46,17 @@ trait WaitForLockTrait
             foreach ($models as $model) {
                 $this->unlock($model, $lock);
             }
+            if ($throwable) {
+                throw $throwable;
+            }
             return false;
         }
 
         return true;
     }
 
-    abstract public function lock(ModelInterface $model, Lock $lock): bool;
+    abstract public function lock(ModelInterface $model, Lock $lock, ?Throwable $throwable = null): bool;
 
-    abstract public function unlock(ModelInterface $model, Lock $lock): bool;
+    abstract public function unlock(ModelInterface $model, Lock $lock, ?Throwable $throwable = null): bool;
 
 }
