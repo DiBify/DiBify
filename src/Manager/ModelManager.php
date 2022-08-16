@@ -14,6 +14,7 @@ use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
 use DiBify\DiBify\Id\Id;
+use DiBify\DiBify\Id\IdGeneratorInterface;
 use DiBify\DiBify\Locker\Lock\ServiceLock;
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Locker\LockerInterface;
@@ -95,6 +96,15 @@ class ModelManager
         $repo = $this->configManager->getRepository($modelObjectOrClassOrAlias);
         $this->repositories[get_class($repo)] = $repo;
         return $repo;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws UnknownModelException
+     */
+    public function getIdGenerator(ModelInterface|Reference|string $modelObjectOrClassOrAlias): IdGeneratorInterface
+    {
+        return $this->configManager->getIdGenerator($modelObjectOrClassOrAlias);
     }
 
     /**

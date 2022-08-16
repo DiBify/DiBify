@@ -9,6 +9,7 @@ namespace DiBify\DiBify\Manager;
 
 use DiBify\DiBify\Exceptions\LockedModelException;
 use DiBify\DiBify\Id\Id;
+use DiBify\DiBify\Id\IdGeneratorInterface;
 use DiBify\DiBify\Id\UuidGenerator;
 use DiBify\DiBify\Locker\DummyLocker;
 use DiBify\DiBify\Locker\Lock\Lock;
@@ -29,6 +30,12 @@ class ModelManagerTest extends TestCase
     /** @var LockerInterface */
     private $locker;
 
+    /** @var IdGeneratorInterface */
+    private $idGenerator_1;
+
+    /** @var IdGeneratorInterface */
+    private $idGenerator_2;
+
     /** @var TestRepo_1 */
     private $repo_1;
 
@@ -46,7 +53,9 @@ class ModelManagerTest extends TestCase
     {
         parent::setUp();
         $this->locker = new DummyLocker();
-        $idGenerator = new UuidGenerator();
+
+        $this->idGenerator_1 = new UuidGenerator();
+        $this->idGenerator_2 = new UuidGenerator();
 
         $this->repo_1 = new TestRepo_1();
         $this->repo_2 = new TestRepo_2();
@@ -56,13 +65,13 @@ class ModelManagerTest extends TestCase
         $configManager->add(
             $this->repo_1,
             [TestModel_1::class],
-            $idGenerator
+            $this->idGenerator_1
         );
 
         $configManager->add(
             $this->repo_2,
             [TestModel_2::class],
-            $idGenerator
+            $this->idGenerator_2
         );
 
         $this->onEvents = [];
@@ -91,6 +100,19 @@ class ModelManagerTest extends TestCase
         $this->assertSame(
             $this->repo_2,
             $this->manager->getRepository(TestModel_2::class)
+        );
+    }
+
+    public function testGetIdGenerator(): void
+    {
+        $this->assertSame(
+            $this->idGenerator_1,
+            $this->manager->getIdGenerator(TestModel_1::class)
+        );
+
+        $this->assertSame(
+            $this->idGenerator_2,
+            $this->manager->getIdGenerator(TestModel_2::class)
         );
     }
 
