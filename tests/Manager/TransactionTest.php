@@ -165,6 +165,19 @@ class TransactionTest extends TestCase
         $this->assertFalse($this->transaction->isPersisted($model_3));
     }
 
+    public function testPersistsWithRecursion(): void
+    {
+        $model_1 = new TestModel_1();
+        $model_2 = new TestModel_2();
+
+        Transaction::persistsWith($model_1, $model_2);
+        Transaction::persistsWith($model_2, $model_1);
+
+        $this->transaction->persists($model_1);
+        $this->assertTrue($this->transaction->isPersisted($model_1));
+        $this->assertTrue($this->transaction->isPersisted($model_2));
+    }
+
     public function testIsPersistsWith(): void
     {
         $primary = $this->deleted[0];
@@ -210,6 +223,19 @@ class TransactionTest extends TestCase
         $this->assertTrue($this->transaction->isPersisted($model));
         $this->assertTrue($this->transaction->isPersisted($shouldBeDeleted_1));
         $this->assertTrue($this->transaction->isPersisted($shouldBeDeleted_2));
+    }
+
+    public function testWithPersistsDeleteRecursion(): void
+    {
+        $model_1 = new TestModel_1();
+        $model_2 = new TestModel_2();
+
+        Transaction::persistsWith($model_1, $model_2);
+        Transaction::withPersistsDelete($model_2, $model_1);
+
+        $this->transaction->persists($model_1);
+        $this->assertTrue($this->transaction->isDeleted($model_1));
+        $this->assertTrue($this->transaction->isPersisted($model_2));
     }
 
     public function testIsWithPersistsDelete(): void
@@ -296,6 +322,19 @@ class TransactionTest extends TestCase
         $this->assertFalse($this->transaction->isDeleted($model_3));
     }
 
+    public function testDeleteWithRecursion(): void
+    {
+        $model_1 = $this->persisted[0];
+        $model_2 = $this->persisted[1];
+
+        Transaction::deleteWith($model_1, $model_2);
+        Transaction::deleteWith($model_2, $model_1);
+
+        $this->transaction->delete($model_1);
+        $this->assertTrue($this->transaction->isDeleted($model_1));
+        $this->assertTrue($this->transaction->isDeleted($model_2));
+    }
+
     public function testIsDeleteWith(): void
     {
         $primary = $this->persisted[0];
@@ -341,6 +380,19 @@ class TransactionTest extends TestCase
         $this->assertTrue($this->transaction->isDeleted($model));
         $this->assertTrue($this->transaction->isDeleted($shouldBePersisted_1));
         $this->assertTrue($this->transaction->isDeleted($shouldBePersisted_2));
+    }
+
+    public function testWithDeletePersistsRecursion(): void
+    {
+        $model_1 = $this->persisted[0];
+        $model_2 = $this->persisted[1];
+
+        Transaction::deleteWith($model_1, $model_2);
+        Transaction::withDeletePersists($model_2, $model_1);
+
+        $this->transaction->delete($model_1);
+        $this->assertTrue($this->transaction->isPersisted($model_1));
+        $this->assertTrue($this->transaction->isDeleted($model_2));
     }
 
     public function testIsWithDeletePersists(): void

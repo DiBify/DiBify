@@ -97,12 +97,14 @@ class Transaction
             unset($this->deleted[$hash]);
 
             foreach (self::$persistsWith[$model] ?? [] as $linkedModel) {
+                self::split(self::$persistsWith, $model, $linkedModel);
                 $this->persists($linkedModel);
             }
 
             unset(self::$persistsWith[$model]);
 
             foreach (self::$withPersistsDelete[$model] ?? [] as $linkedModel) {
+                self::split(self::$withPersistsDelete, $model, $linkedModel);
                 $this->delete($linkedModel);
             }
 
@@ -158,12 +160,14 @@ class Transaction
             unset($this->persisted[$hash]);
 
             foreach (self::$deleteWith[$model] ?? [] as $linkedModel) {
+                self::split(self::$deleteWith, $model, $linkedModel);
                 $this->delete($linkedModel);
             }
 
             unset(self::$deleteWith[$model]);
 
             foreach (self::$withDeletePersists[$model] ?? [] as $linkedModel) {
+                self::split(self::$withDeletePersists, $model, $linkedModel);
                 $this->persists($linkedModel);
             }
 
@@ -263,6 +267,14 @@ class Transaction
     {
         $current = $map[$primary] ?? [];
         $map[$primary] = array_merge($current, $models);
+    }
+
+    private static function split(SplObjectStorage $map, ModelInterface $primary, ModelInterface $model): void
+    {
+        $current = $map[$primary] ?? [];
+        $map[$primary] = array_filter($current, function (ModelInterface $inArrayModel) use ($model) {
+            return $inArrayModel !== $model;
+        });
     }
 
     public static function freeUpMemory(): void
