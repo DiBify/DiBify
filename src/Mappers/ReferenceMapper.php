@@ -23,8 +23,8 @@ class ReferenceMapper extends ObjectMapper
     {
         $this->eager = $eager;
         parent::__construct(Reference::class, [
+            'alias' => StringMapper::getInstance(),
             'id' => IdMapper::getInstance(),
-            'alias' => StringMapper::getInstance()
         ]);
     }
 
