@@ -62,7 +62,7 @@ class LazyIterator implements Iterator
         $this->onAfterBatch = $onAfterBatch;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->currentModels[$this->currentKey];
     }
@@ -78,7 +78,7 @@ class LazyIterator implements Iterator
         }
     }
 
-    public function key()
+    public function key(): string
     {
         $model = $this->currentModels[$this->currentKey];
         return (string) $model->id();

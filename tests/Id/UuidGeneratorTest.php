@@ -21,7 +21,7 @@ class UuidGeneratorTest extends TestCase
         $pattern = '~^[a-z\d]{8}-([a-z\d]{4}-){3}[a-z\d]{12}$~';
 
         $id = $generator($model);
-        $this->assertRegExp($pattern, (string) $id);
+        $this->assertMatchesRegularExpression($pattern, (string) $id);
     }
 
 }
