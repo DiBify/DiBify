@@ -17,7 +17,7 @@ class ReferenceMapperTest extends MapperTestCase
         return [
             [
                 Reference::create('model', new Id(1)),
-                ['id' => '1', 'alias' => 'model']
+                ['alias' => 'model', 'id' => '1']
             ],
         ];
     }
