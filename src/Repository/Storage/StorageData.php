@@ -13,12 +13,15 @@ use JsonSerializable;
 class StorageData implements JsonSerializable
 {
 
+    public ?string $scope = null;
+
     public string $id;
 
     public array $body;
 
-    public function __construct(string $id, array $body)
+    public function __construct(string $id, array $body, ?string $scope = null)
     {
+        $this->scope = $scope;
         $this->id = $id;
         $this->body = $body;
     }
@@ -26,6 +29,7 @@ class StorageData implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'scope' => $this->scope,
             'id' => $this->id,
             'body' => $this->body,
         ];
@@ -33,7 +37,9 @@ class StorageData implements JsonSerializable
 
     public static function fromArray(array $array): StorageData
     {
-        return new StorageData($array['id'], $array['body']);
+        $data = new StorageData($array['id'], $array['body']);
+        $data->scope = $array['scope'] ?? null;
+        return $data;
     }
 
     public static function fromJson(string $json): StorageData
