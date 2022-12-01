@@ -8,7 +8,9 @@
 namespace DiBify\DiBify\Repository\Storage;
 
 
-class StorageData
+use JsonSerializable;
+
+class StorageData implements JsonSerializable
 {
 
     public string $id;
@@ -19,6 +21,24 @@ class StorageData
     {
         $this->id = $id;
         $this->body = $body;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'body' => $this->body,
+        ];
+    }
+
+    public static function fromArray(array $array): StorageData
+    {
+        return new StorageData($array['id'], $array['body']);
+    }
+
+    public static function fromJson(string $json): StorageData
+    {
+        return self::fromArray(json_decode($json, true));
     }
 
 }
