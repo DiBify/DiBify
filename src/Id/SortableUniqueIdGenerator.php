@@ -28,9 +28,9 @@ class SortableUniqueIdGenerator implements IdGeneratorInterface
         return $model->id();
     }
 
-    public static function generate(int $length = 16, string $separator = ''): string
+    public static function generate(int $length = 16, string $separator = '', float $timestamp = null): string
     {
-        $microtime = round(microtime(true) * 1000);
+        $microtime = round(($timestamp ?? microtime(true)) * 1000);
         $time = base_convert($microtime, 10, 36);
         $randLength = $length - strlen($time) - strlen($separator);
         $rand = '';

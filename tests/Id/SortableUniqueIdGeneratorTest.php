@@ -11,12 +11,24 @@ class SortableUniqueIdGeneratorTest extends TestCase
     public function invokeDataProvider(): array
     {
         return [
-            [16, '', '~^[\da-z]{16}$~'],
-            [32, '', '~^[\da-z]{32}$~'],
-            [10, '', '~^[\da-z]{10}$~'],
-            [17, '-', '~^[\da-z]{8}-[\da-z]{8}$~'],
-            [33, '-', '~^[\da-z]{8}-[\da-z]{24}$~'],
-            [11, '-', '~^[\da-z]{8}-[\da-z]{2}$~'],
+            [16, '', '~^[\da-z]{16}$~', null],
+            [32, '', '~^[\da-z]{32}$~', null],
+            [10, '', '~^[\da-z]{10}$~', null],
+            [17, '-', '~^[\da-z]{8}-[\da-z]{8}$~', null],
+            [33, '-', '~^[\da-z]{8}-[\da-z]{24}$~', null],
+            [11, '-', '~^[\da-z]{8}-[\da-z]{2}$~', null],
+        ];
+    }
+
+    public function generateDataProvider(): array
+    {
+        return [
+            [16, '', '~^lb8igo5c[\da-z]{8}$~', 1670106792.000],
+            [32, '', '~^lb8igo5c[\da-z]{24}$~', 1670106792],
+            [10, '', '~^lb8igo5c[\da-z]{2}$~', 1670106792.000],
+            [17, '-', '~^lb8igo5c-[\da-z]{8}$~', 1670106792.000],
+            [33, '-', '~^lb8igo5c-[\da-z]{24}$~', 1670106792.000],
+            [11, '-', '~^lb8igo5c-[\da-z]{2}$~', 1670106792.000],
         ];
     }
 
@@ -37,16 +49,18 @@ class SortableUniqueIdGeneratorTest extends TestCase
 
     /**
      * @dataProvider invokeDataProvider
+     * @dataProvider generateDataProvider
      * @param int $length
      * @param string $separator
      * @param string $pattern
+     * @param float|null $timestamp
      * @return void
      */
-    public function testGenerate(int $length, string $separator, string $pattern): void
+    public function testGenerate(int $length, string $separator, string $pattern, ?float $timestamp): void
     {
         $this->assertMatchesRegularExpression(
             $pattern,
-            SortableUniqueIdGenerator::generate($length, $separator)
+            SortableUniqueIdGenerator::generate($length, $separator, $timestamp)
         );
     }
 
