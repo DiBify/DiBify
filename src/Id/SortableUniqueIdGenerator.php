@@ -32,22 +32,25 @@ class SortableUniqueIdGenerator implements IdGeneratorInterface
     {
         $microtime = round(microtime(true) * 1000);
         $time = base_convert($microtime, 10, 36);
-        return static::addRandomSuffix($time, $length, $separator);
-    }
-
-    public static function mock(float $timestamp, int $length = 16, string $separator = ''): string
-    {
-        $microtime = round($timestamp * 1000);
-        $time = base_convert($microtime, 10, 36);
-        return static::addRandomSuffix($time, $length, $separator);
-    }
-
-    protected static function addRandomSuffix(string $time, int $length = 16, string $separator = ''): string
-    {
         $randLength = $length - strlen($time) - strlen($separator);
         $rand = '';
         while (strlen($rand) < $randLength) {
             $rand.= base_convert(rand(1000000000, 9999999999), 10, 36);
+        }
+
+        $rand = substr($rand, 0, $randLength);
+
+        return join($separator, [$time, $rand]);
+    }
+
+    public static function fixture(float $timestamp, int $length = 16, string $separator = ''): string
+    {
+        $microtime = round($timestamp * 1000);
+        $time = base_convert($microtime, 10, 36);
+        $randLength = $length - strlen($time) - strlen($separator);
+        $rand = '';
+        while (strlen($rand) < $randLength) {
+            $rand.= $time;
         }
 
         $rand = substr($rand, 0, $randLength);

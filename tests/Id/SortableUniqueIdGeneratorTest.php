@@ -50,31 +50,31 @@ class SortableUniqueIdGeneratorTest extends TestCase
         );
     }
 
-    public function mockDataProvider(): array
+    public function fixtureDataProvider(): array
     {
         return [
-            [1670106792, 16, '', '~^lb8igo5c[\da-z]{8}$~'],
-            [1670106792, 32, '', '~^lb8igo5c[\da-z]{24}$~'],
-            [1670106792.000, 10, '', '~^lb8igo5c[\da-z]{2}$~'],
-            [1670106792, 17, '-', '~^lb8igo5c-[\da-z]{8}$~'],
-            [1670106792, 33, '-', '~^lb8igo5c-[\da-z]{24}$~'],
-            [1670106792.000, 11, '-', '~^lb8igo5c-[\da-z]{2}$~'],
+            [1670106792, 16, '', '~^lb8igo5clb8igo5c$~'],
+            [1670106792, 32, '', '~^lb8igo5clb8igo5clb8igo5clb8igo5c$~'],
+            [1670106792.000, 10, '', '~^lb8igo5clb$~'],
+            [1670106792, 17, '-', '~^lb8igo5c-lb8igo5c$~'],
+            [1670106792, 33, '-', '~^lb8igo5c-lb8igo5clb8igo5clb8igo5c$~'],
+            [1670106792.000, 11, '-', '~^lb8igo5c-lb$~'],
         ];
     }
 
     /**
-     * @dataProvider mockDataProvider
+     * @dataProvider fixtureDataProvider
      * @param float $timestamp
      * @param int $length
      * @param string $separator
      * @param string $pattern
      * @return void
      */
-    public function testMock(float $timestamp, int $length, string $separator, string $pattern): void
+    public function testFixture(float $timestamp, int $length, string $separator, string $pattern): void
     {
         $this->assertMatchesRegularExpression(
             $pattern,
-            SortableUniqueIdGenerator::mock($timestamp, $length, $separator)
+            SortableUniqueIdGenerator::fixture($timestamp, $length, $separator)
         );
     }
 }
