@@ -29,4 +29,6 @@ interface StorageInterface
 
     public function delete(string $id, array $options = []): void;
 
+    public function scope(): ?string;
+
 }

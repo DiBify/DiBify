@@ -57,4 +57,9 @@ class TestStorage implements StorageInterface
     {
         unset($this->data[$id]);
     }
+
+    public function scope(): ?string
+    {
+        return null;
+    }
 }
