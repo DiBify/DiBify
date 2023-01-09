@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Replicator;
 
 
+use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
@@ -31,10 +32,10 @@ interface ReplicatorInterface
      */
     public function getSlaves(): array;
 
-    public function insert(StorageData $data): void;
+    public function insert(StorageData $data, Transaction $transaction): void;
 
-    public function update(StorageData $data): void;
+    public function update(StorageData $data, Transaction $transaction): void;
 
-    public function delete(string $id): void;
+    public function delete(string $id, Transaction $transaction): void;
 
 }

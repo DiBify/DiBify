@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Replicator;
 
 
+use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
@@ -43,7 +44,7 @@ class DirectReplicator implements ReplicatorInterface
         return $this->slaves;
     }
 
-    public function insert(StorageData $data): void
+    public function insert(StorageData $data, Transaction $transaction): void
     {
         $this->primary->insert($data);
         foreach ($this->slaves as $slave) {
@@ -51,7 +52,7 @@ class DirectReplicator implements ReplicatorInterface
         }
     }
 
-    public function update(StorageData $data): void
+    public function update(StorageData $data, Transaction $transaction): void
     {
         $this->primary->update($data);
         foreach ($this->slaves as $slave) {
@@ -59,7 +60,7 @@ class DirectReplicator implements ReplicatorInterface
         }
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, Transaction $transaction): void
     {
         $this->primary->delete($id);
         foreach ($this->slaves as $slave) {

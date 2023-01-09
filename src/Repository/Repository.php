@@ -120,15 +120,15 @@ abstract class Repository
             foreach ($transaction->getPersisted($class) as $model) {
                 $data = $this->getMapper()->serialize($model);
                 if ($this->isRegistered($model)) {
-                    $this->replicator->update($data);
+                    $this->replicator->update($data, $transaction);
                 } else {
-                    $this->replicator->insert($data);
+                    $this->replicator->insert($data, $transaction);
                     $this->register($model);
                 }
             }
 
             foreach ($transaction->getDeleted($class) as $model) {
-                $this->replicator->delete((string) $model->id());
+                $this->replicator->delete((string) $model->id(), $transaction);
                 $this->unregister($model);
             }
         }
