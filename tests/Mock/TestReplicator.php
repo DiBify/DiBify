@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Mock;
 
 
+use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
@@ -45,17 +46,17 @@ class TestReplicator implements ReplicatorInterface
         return $this->slaves;
     }
 
-    public function insert(StorageData $data): void
+    public function insert(StorageData $data, Transaction $transaction): void
     {
         return;
     }
 
-    public function update(StorageData $data): void
+    public function update(StorageData $data, Transaction $transaction): void
     {
         return;
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, Transaction $transaction): void
     {
         return;
     }
