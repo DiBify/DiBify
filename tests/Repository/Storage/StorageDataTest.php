@@ -2,6 +2,7 @@
 
 namespace DiBify\DiBify\Repository\Storage;
 
+use DiBify\DiBify\Manager\ModelManager;
 use PHPUnit\Framework\TestCase;
 
 class StorageDataTest extends TestCase
@@ -17,8 +18,18 @@ class StorageDataTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        ModelManager::setScope(null);
         $this->dataNoScope = new StorageData($this->id, $this->body);
         $this->dataWithScope = new StorageData($this->id, $this->body, $this->scope);
+    }
+
+    public function testConstruct(): void
+    {
+        $data = new StorageData($this->id, $this->body);
+        $this->assertNull($data->scope);
+        ModelManager::setScope('test');
+        $data = new StorageData($this->id, $this->body);
+        $this->assertSame('test', $data->scope);
     }
 
     public function testJsonSerialize(): void

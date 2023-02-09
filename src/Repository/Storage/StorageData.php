@@ -8,6 +8,7 @@
 namespace DiBify\DiBify\Repository\Storage;
 
 
+use DiBify\DiBify\Manager\ModelManager;
 use JsonSerializable;
 
 class StorageData implements JsonSerializable
@@ -21,7 +22,7 @@ class StorageData implements JsonSerializable
 
     public function __construct(string $id, array $body, ?string $scope = null)
     {
-        $this->scope = $scope;
+        $this->scope = $scope ?? ModelManager::getScope();
         $this->id = $id;
         $this->body = $body;
     }

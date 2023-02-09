@@ -47,6 +47,8 @@ class ModelManager implements FreeUpMemoryInterface
 
     private static self $instance;
 
+    private static ?string $scope = null;
+
     private function __construct(
         ConfigManager $configManager,
         LockerInterface $locker,
@@ -321,6 +323,20 @@ class ModelManager implements FreeUpMemoryInterface
                 $this->getLocker()->unlock($model, $lock);
             }
         }
+    }
+
+    public static function getScope(): ?string
+    {
+        return self::$scope;
+    }
+
+    public static function setScope(?string $scope): void
+    {
+        if (self::$scope !== $scope && self::$instance) {
+            self::$instance->freeUpMemory();
+        }
+
+        self::$scope = $scope;
     }
 
 }

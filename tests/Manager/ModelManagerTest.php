@@ -95,6 +95,12 @@ class ModelManagerTest extends TestCase
         );
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->manager::setScope(null);
+    }
+
     public function testGetLocker(): void
     {
         $this->assertSame($this->locker, $this->manager->getLocker());
@@ -313,6 +319,23 @@ class ModelManagerTest extends TestCase
         $this->manager->freeUpMemory();
         $this->assertCount(0, $this->repo_1->getRegistered());
         $this->assertSame(1, $freeUp);
+    }
+
+    public function testGetSetScope(): void
+    {
+        $this->assertNull($this->manager::getScope());
+
+        $repo = $this->manager->getRepository(TestModel_1::class);
+        $repo->findById(1);
+        $this->assertCount(1, $this->repo_1->getRegistered());
+
+        $this->manager::setScope(null);
+
+        $this->assertCount(1, $this->repo_1->getRegistered());
+
+        $this->manager::setScope('test');
+
+        $this->assertCount(0, $this->repo_1->getRegistered());
     }
 
 }
