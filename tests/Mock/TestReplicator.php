@@ -19,11 +19,11 @@ class TestReplicator implements ReplicatorInterface
     /**
      * @var StorageInterface|null
      */
-    private $primary;
+    private ?StorageInterface $primary;
     /**
-     * @var array
+     * @var StorageInterface[]
      */
-    private $slaves;
+    private array $slaves;
 
     public function __construct(StorageInterface $primary = null, array $slaves = [])
     {
@@ -59,5 +59,13 @@ class TestReplicator implements ReplicatorInterface
     public function delete(string $id, Transaction $transaction): void
     {
         return;
+    }
+
+    public function freeUpMemory(): void
+    {
+        $this->primary->freeUpMemory();
+        foreach ($this->slaves as $slave) {
+            $slave->freeUpMemory();
+        }
     }
 }

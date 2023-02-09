@@ -8,11 +8,12 @@
 namespace DiBify\DiBify\Replicator;
 
 
+use DiBify\DiBify\Components\FreeUpMemoryInterface;
 use DiBify\DiBify\Manager\Transaction;
 use DiBify\DiBify\Repository\Storage\StorageData;
 use DiBify\DiBify\Repository\Storage\StorageInterface;
 
-interface ReplicatorInterface
+interface ReplicatorInterface extends FreeUpMemoryInterface
 {
 
     /**

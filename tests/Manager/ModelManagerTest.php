@@ -21,6 +21,7 @@ use DiBify\DiBify\Mock\TestRepo_1;
 use DiBify\DiBify\Mock\TestRepo_2;
 use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\Reference;
+use DiBify\DiBify\Replicator\ReplicatorInterface;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -35,6 +36,12 @@ class ModelManagerTest extends TestCase
 
     /** @var IdGeneratorInterface */
     private $idGenerator_2;
+
+    /** @var ReplicatorInterface  */
+    private ReplicatorInterface $replicator_1;
+
+    /** @var ReplicatorInterface  */
+    private ReplicatorInterface $replicator_2;
 
     /** @var TestRepo_1 */
     private $repo_1;
@@ -57,8 +64,11 @@ class ModelManagerTest extends TestCase
         $this->idGenerator_1 = new UuidGenerator();
         $this->idGenerator_2 = new UuidGenerator();
 
-        $this->repo_1 = new TestRepo_1();
-        $this->repo_2 = new TestRepo_2();
+        $this->replicator_1 = $this->createMock(ReplicatorInterface::class);
+        $this->replicator_2 = $this->createMock(ReplicatorInterface::class);
+
+        $this->repo_1 = new TestRepo_1($this->replicator_1);
+        $this->repo_2 = new TestRepo_2($this->replicator_2);
 
         $configManager = new ConfigManager();
 
@@ -289,11 +299,20 @@ class ModelManagerTest extends TestCase
 
     public function testFreeUpMemory(): void
     {
+        $freeUp = 0;
+
         $repo = $this->manager->getRepository(TestModel_1::class);
         $repo->findById(1);
         $this->assertCount(1, $this->repo_1->getRegistered());
+        $this->assertSame(0, $freeUp);
+
+        $this->replicator_1->method('freeUpMemory')->willReturnCallback(function () use (&$freeUp) {
+            $freeUp++;
+        });
+
         $this->manager->freeUpMemory();
         $this->assertCount(0, $this->repo_1->getRegistered());
+        $this->assertSame(1, $freeUp);
     }
 
 }

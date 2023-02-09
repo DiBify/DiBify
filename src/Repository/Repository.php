@@ -141,6 +141,7 @@ abstract class Repository
     public function freeUpMemory(): void
     {
         $this->registered = [];
+        $this->replicator->freeUpMemory();
     }
 
     abstract protected function getMapper(): MapperInterface;

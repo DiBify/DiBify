@@ -67,4 +67,12 @@ class DirectReplicator implements ReplicatorInterface
             $slave->delete($id);
         }
     }
+
+    public function freeUpMemory(): void
+    {
+        $this->primary->freeUpMemory();
+        foreach ($this->slaves as $slave) {
+            $slave->freeUpMemory();
+        }
+    }
 }

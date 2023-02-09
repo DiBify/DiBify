@@ -62,4 +62,9 @@ class TestStorage implements StorageInterface
     {
         return null;
     }
+
+    public function freeUpMemory(): void
+    {
+        $this->data = [];
+    }
 }

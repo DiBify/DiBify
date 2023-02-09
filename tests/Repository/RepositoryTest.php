@@ -86,4 +86,15 @@ class RepositoryTest extends TestCase
         $this->assertSame($model_2, $changes[$model_2]);
         $this->assertNull($changes[$model_3]);
     }
+
+    public function testFreeUpMemory(): void
+    {
+        $model = $this->repo->findById(1);
+        $this->assertInstanceOf(TestModel_1::class, $model);
+
+        $this->repo->freeUpMemory();
+
+        $model = $this->repo->findById(1);
+        $this->assertNull($model);
+    }
 }

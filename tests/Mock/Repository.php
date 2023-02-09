@@ -10,17 +10,18 @@ use DiBify\DiBify\Mappers\ModelMapper;
 use DiBify\DiBify\Mappers\NullOrMapper;
 use DiBify\DiBify\Mappers\StringMapper;
 use DiBify\DiBify\Model\ModelInterface;
+use DiBify\DiBify\Replicator\ReplicatorInterface;
 use Exception;
 
 abstract class Repository extends \DiBify\DiBify\Repository\Repository
 {
 
-    /** @var ModelInterface */
-    public $models;
+    /** @var ModelInterface[] */
+    public array $models;
 
-    public function __construct()
+    public function __construct(?ReplicatorInterface $replicator = null)
     {
-        parent::__construct(new TestReplicator());
+        parent::__construct($replicator ?? new TestReplicator());
         $class = current($this->classes());
         $this->models = [
             '1' => new $class(1),

@@ -6,6 +6,7 @@
 
 namespace DiBify\DiBify\Manager;
 
+use DiBify\DiBify\Components\FreeUpMemoryInterface;
 use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
@@ -26,7 +27,7 @@ use DiBify\DiBify\Repository\Repository;
 use SplObjectStorage;
 use Throwable;
 
-class ModelManager
+class ModelManager implements FreeUpMemoryInterface
 {
     private ConfigManager $configManager;
 

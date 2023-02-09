@@ -8,7 +8,9 @@
 namespace DiBify\DiBify\Repository\Storage;
 
 
-interface StorageInterface
+use DiBify\DiBify\Components\FreeUpMemoryInterface;
+
+interface StorageInterface extends FreeUpMemoryInterface
 {
 
     /**
