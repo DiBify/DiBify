@@ -32,7 +32,7 @@ class ModelManager implements FreeUpMemoryInterface
     private ConfigManager $configManager;
 
     /** @var Repository[] */
-    private array $repositories;
+    private array $repositories = [];
 
     private LockerInterface $locker;
 
