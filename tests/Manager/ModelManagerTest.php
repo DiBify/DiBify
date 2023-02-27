@@ -132,6 +132,14 @@ class ModelManagerTest extends TestCase
         );
     }
 
+    public function testGetSetRetryPolicy(): void
+    {
+        $this->assertNull($this->manager->getRetryPolicy());
+        $policy = new RetryPolicy();
+        $this->manager->setRetryPolicy($policy);
+        $this->assertSame($policy, $this->manager->getRetryPolicy());
+    }
+
     public function testFindByReference(): void
     {
         $reference = Reference::create(TestModel_1::getModelAlias(), 2);
@@ -302,6 +310,34 @@ class ModelManagerTest extends TestCase
 
         $this->assertTrue($model->onBeforeCommit);
         $this->assertTrue($model->onAfterCommit);
+    }
+
+    public function testCommitGlobalRetryPolicy(): void
+    {
+        $attempt = 0;
+        $policy = new RetryPolicy(null, function () use (&$attempt) {
+            $attempt++;
+        });
+        $this->manager->setRetryPolicy($policy);
+
+        $model = new TestModel_1('exception');
+        $transaction = new Transaction([$model]);
+
+        try {
+            $this->manager->commit($transaction);
+        } catch (\Exception) {
+            $this->assertSame(2, $attempt);
+        }
+
+        $attempt = 0;
+        $transaction = new Transaction([$model], [], new RetryPolicy(null, function () use (&$attempt) {
+            $attempt++;
+        }, 5));
+        try {
+            $this->manager->commit($transaction);
+        } catch (\Exception) {
+            $this->assertSame(5, $attempt);
+        }
     }
 
     public function testFreeUpMemory(): void

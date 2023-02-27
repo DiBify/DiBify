@@ -444,6 +444,15 @@ class TransactionTest extends TestCase
         $this->assertTrue($this->transaction->isDeleted($deleted_3));
     }
 
+    public function testGetRetryPolicy(): void
+    {
+        $this->assertNull($this->transaction->getRetryPolicy());
+
+        $policy = new RetryPolicy();
+        $transaction = new Transaction([], [], $policy);
+        $this->assertSame($policy, $transaction->getRetryPolicy());
+    }
+
     public function testGetSetMetadata(): void
     {
         $this->assertNull($this->transaction->getMetadata('key'));

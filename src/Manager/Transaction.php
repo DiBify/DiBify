@@ -22,6 +22,8 @@ class Transaction
     /** @var ModelInterface[] */
     protected array $deleted = [];
 
+    protected ?RetryPolicy $retryPolicy;
+
     protected array $metadata = [];
 
     private static SplObjectStorage $persistsWith;
@@ -38,7 +40,7 @@ class Transaction
      * @param ModelInterface[] $deleted
      * @throws Exception
      */
-    public function __construct(array $persisted = [], array $deleted = [])
+    public function __construct(array $persisted = [], array $deleted = [], ?RetryPolicy $retryPolicy = null)
     {
         if (!isset(self::$persistsWith)) {
             self::$persistsWith = new SplObjectStorage();
@@ -59,6 +61,7 @@ class Transaction
         $this->id = new Id(UuidGenerator::generate());
         $this->persists(...$persisted);
         $this->delete(...$deleted);
+        $this->retryPolicy = $retryPolicy;
     }
 
     public function id(): Id
@@ -178,6 +181,11 @@ class Transaction
     public function resetDeleted(): void
     {
         $this->deleted = [];
+    }
+
+    public function getRetryPolicy(): ?RetryPolicy
+    {
+        return $this->retryPolicy;
     }
 
     public function getMetadata(string $key)

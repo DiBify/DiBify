@@ -45,6 +45,8 @@ class ModelManager implements FreeUpMemoryInterface
     /** @var callable */
     private $onCommitException;
 
+    private ?RetryPolicy $retryPolicy;
+
     private static self $instance;
 
     private static ?string $scope = null;
@@ -54,7 +56,8 @@ class ModelManager implements FreeUpMemoryInterface
         LockerInterface $locker,
         ?callable $onBeforeCommit,
         ?callable $onAfterCommit,
-        ?callable $onCommitException
+        ?callable $onCommitException,
+        RetryPolicy $retryPolicy = null
     )
     {
         $this->configManager = $configManager;
@@ -63,6 +66,7 @@ class ModelManager implements FreeUpMemoryInterface
         $this->onBeforeCommit = $onBeforeCommit ?? function () {};
         $this->onAfterCommit = $onAfterCommit ?? function () {};
         $this->onCommitException = $onCommitException ?? function () {};
+        $this->retryPolicy = $retryPolicy;
     }
 
     public static function construct(
@@ -108,6 +112,16 @@ class ModelManager implements FreeUpMemoryInterface
     public function getIdGenerator(ModelInterface|Reference|string $modelObjectOrClassOrAlias): IdGeneratorInterface
     {
         return $this->configManager->getIdGenerator($modelObjectOrClassOrAlias);
+    }
+
+    public function getRetryPolicy(): ?RetryPolicy
+    {
+        return $this->retryPolicy;
+    }
+
+    public function setRetryPolicy(?RetryPolicy $retryPolicy): void
+    {
+        $this->retryPolicy = $retryPolicy;
     }
 
     /**
@@ -247,6 +261,55 @@ class ModelManager implements FreeUpMemoryInterface
         ($this->onBeforeCommit)($transaction);
         $models = array_merge($transaction->getPersisted(), $transaction->getDeleted());
 
+        $retryPolicy = $transaction->getRetryPolicy() ?? $this->retryPolicy;
+
+        try {
+            $this->commitInternal($transaction, $lock, ...$models);
+            return;
+        } catch (Throwable $throwable) {
+            if (!$retryPolicy) {
+
+                //Unlock ServiceLock's if no retry policy
+                $lock instanceof ServiceLock && $this->unlock($models, $lock);
+
+                //Throw-up exception
+                throw $throwable;
+            }
+        }
+
+        $attempt = 1;
+        while ($retryPolicy->isRetryRequired($transaction, $throwable, $attempt)) {
+            $retryPolicy->runBeforeRetry($transaction, $throwable, $attempt);
+            try {
+                $this->commitInternal($transaction, $lock, ...$models);
+                return;
+            } catch (Throwable $throwable) {
+                $attempt++;
+            }
+        }
+
+        //Unlock ServiceLock's
+        $lock instanceof ServiceLock && $this->unlock($models, $lock);
+
+        //Throw-up exception
+        throw $throwable;
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @param Lock|null $lock
+     * @param ModelInterface ...$models
+     * @return void
+     * @throws DuplicateModelException
+     * @throws InvalidArgumentException
+     * @throws LockedModelException
+     * @throws NotPermanentIdException
+     * @throws SerializerException
+     * @throws Throwable
+     * @throws UnknownModelException
+     */
+    protected function commitInternal(Transaction $transaction, ?Lock $lock, ModelInterface ...$models): void
+    {
         try {
             $this->lock($models, $lock);
 
@@ -269,11 +332,6 @@ class ModelManager implements FreeUpMemoryInterface
             }
 
         } catch (Throwable $exception) {
-
-            if ($lock instanceof ServiceLock) {
-                $this->unlock($models, $lock);
-            }
-
             ($this->onCommitException)($transaction, $exception);
             throw $exception;
         }
