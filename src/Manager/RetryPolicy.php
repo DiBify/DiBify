@@ -11,10 +11,10 @@ class RetryPolicy
 {
 
     /** @var callable */
-    private $isRetryRequired;
+    private $isRetryRequiredCallable;
 
     /** @var callable */
-    private $beforeRetry;
+    private $beforeRetryCallable;
 
     public function __construct(
         callable   $isRetryRequiredCallable = null,
@@ -23,25 +23,27 @@ class RetryPolicy
         public int $delay = 500000,
     )
     {
-        $this->isRetryRequired = $isRetryRequiredCallable ?? fn() => true;
-        $this->beforeRetry = $beforeRetryCallable ?? fn() => true;
+        $this->isRetryRequiredCallable = $isRetryRequiredCallable ?? fn() => true;
+        $this->beforeRetryCallable = $beforeRetryCallable ?? fn() => true;
     }
 
-    public function isRetryRequired(Transaction $transaction, Throwable $throwable, int $attempt): bool
+    public function runBeforeRetry(Transaction $transaction, Throwable $throwable, int $attempt): bool
+    {
+        if ($this->isRetryRequired($transaction, $throwable, $attempt)) {
+            usleep($this->delay);
+            ($this->beforeRetryCallable)($transaction, $throwable, $attempt);
+            return true;
+        }
+        return false;
+    }
+
+    private function isRetryRequired(Transaction $transaction, Throwable $throwable, int $attempt): bool
     {
         if ($attempt > $this->retries) {
             return false;
         }
 
-        return ($this->isRetryRequired)($transaction, $throwable, $attempt);
-    }
-
-    public function runBeforeRetry(Transaction $transaction, Throwable $throwable, int $attempt): void
-    {
-        if ($this->isRetryRequired($transaction, $throwable, $attempt)) {
-            usleep($this->delay);
-            ($this->beforeRetry)($transaction, $throwable, $attempt);
-        }
+        return ($this->isRetryRequiredCallable)($transaction, $throwable, $attempt);
     }
 
 }

@@ -278,8 +278,7 @@ class ModelManager implements FreeUpMemoryInterface
         }
 
         $attempt = 1;
-        while ($retryPolicy->isRetryRequired($transaction, $throwable, $attempt)) {
-            $retryPolicy->runBeforeRetry($transaction, $throwable, $attempt);
+        while ($retryPolicy->runBeforeRetry($transaction, $throwable, $attempt)) {
             try {
                 $this->commitInternal($transaction, $lock, ...$models);
                 return;
