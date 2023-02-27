@@ -119,6 +119,14 @@ class ModelManagerTest extends TestCase
         );
     }
 
+    public function testGetRepositories(): void
+    {
+        $this->assertSame([
+            get_class($this->repo_1) => $this->repo_1,
+            get_class($this->repo_2) => $this->repo_2,
+        ], $this->manager->getRepositories());
+    }
+
     public function testGetIdGenerator(): void
     {
         $this->assertSame(

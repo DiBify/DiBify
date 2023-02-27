@@ -105,6 +105,14 @@ class ModelManager implements FreeUpMemoryInterface
         return $repo;
     }
 
+    public function getRepositories(): array
+    {
+        foreach ($this->configManager->getModelClasses() as $modelClass) {
+            $this->getRepository($modelClass);
+        }
+        return $this->repositories;
+    }
+
     /**
      * @throws InvalidArgumentException
      * @throws UnknownModelException

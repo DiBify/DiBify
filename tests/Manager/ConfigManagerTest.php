@@ -106,6 +106,16 @@ class ConfigManagerTest extends TestCase
         }
     }
 
+    public function testGetModelClasses(): void
+    {
+        $this->assertEquals([
+            TestModel_1::class,
+            TestModel_1_1::class,
+            TestModel_2::class,
+            TestModel_2_2::class,
+        ], $this->manager->getModelClasses());
+    }
+
     public function testGetRepositoryCallableCallsCount()
     {
         $this->assertSame(

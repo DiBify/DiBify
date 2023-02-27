@@ -50,6 +50,11 @@ class ConfigManager
         return $this->classToRepo[$class];
     }
 
+    public function getModelClasses(): array
+    {
+        return array_keys($this->classToRepo);
+    }
+
     /**
      * @param ModelInterface|Reference|string $anyModelPointer
      * @return IdGeneratorInterface
