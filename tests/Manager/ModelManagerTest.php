@@ -91,7 +91,7 @@ class ModelManagerTest extends TestCase
             $this->locker,
             function (Transaction $commit) {$this->onEvents['before'] = $commit;},
             function (Transaction $commit) {$this->onEvents['after'] = $commit;},
-            function (Transaction $commit) {$this->onEvents['exception'] = $commit;}
+            function (Transaction $commit, Throwable $exception) {$this->onEvents['exception'] = [$commit, $exception];}
         );
     }
 
@@ -224,13 +224,14 @@ class ModelManagerTest extends TestCase
             $this->manager->commit(new Transaction([$model]), $lock);
         } catch (Throwable $throwable) {
             $this->assertInstanceOf(Throwable::class, $throwable);
+            $this->assertSame($throwable, $this->onEvents['exception'][1]);
         }
 
         $locker = $this->manager->getLocker();
         $this->assertNull($locker->getLock($model));
 
-        $this->assertInstanceOf(Transaction::class, $this->onEvents['before'] ?? null);
-        $this->assertInstanceOf(Transaction::class, $this->onEvents['exception'] ?? null);
+        $this->assertInstanceOf(Transaction::class, $this->onEvents['before']);
+        $this->assertInstanceOf(Transaction::class, $this->onEvents['exception'][0]);
         $this->assertArrayNotHasKey('after', $this->onEvents);
     }
 

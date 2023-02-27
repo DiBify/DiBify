@@ -274,7 +274,7 @@ class ModelManager implements FreeUpMemoryInterface
                 $this->unlock($models, $lock);
             }
 
-            ($this->onCommitException)($transaction);
+            ($this->onCommitException)($transaction, $exception);
             throw $exception;
         }
     }
