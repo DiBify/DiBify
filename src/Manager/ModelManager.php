@@ -96,7 +96,7 @@ class ModelManager implements FreeUpMemoryInterface
 
     public function getModelClasses(): array
     {
-        return array_keys($this->configManager->getModelClasses());
+        return $this->configManager->getModelClasses();
     }
 
     /**
