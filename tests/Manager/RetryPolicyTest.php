@@ -18,11 +18,14 @@ class RetryPolicyTest extends TestCase
 
     private int $attempt = 1;
 
+    private ModelManager $modelManager;
+
     private RetryPolicy $policy;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->modelManager = $this->createMock(ModelManager::class);
         $this->transaction = new Transaction();
         $this->transaction->setMetadata('retry', true);
         $this->transaction->setMetadata('init', 0);
@@ -30,16 +33,18 @@ class RetryPolicyTest extends TestCase
         $this->throwable = new Exception('Message');
 
         $this->policy = new RetryPolicy(
-            function (Transaction $transaction, Throwable $throwable, int $attempt) {
+            function (Transaction $transaction, Throwable $throwable, int $attempt, ModelManager $modelManager) {
                 $this->assertSame($this->transaction, $transaction);
                 $this->assertSame($this->throwable, $throwable);
                 $this->assertSame($this->attempt, $attempt);
+                $this->assertSame($this->modelManager, $modelManager);
                 return $this->transaction->getMetadata('retry');
             },
-            function (Transaction $transaction, Throwable $throwable, int $attempt) {
+            function (Transaction $transaction, Throwable $throwable, int $attempt, ModelManager $modelManager) {
                 $this->assertSame($this->transaction, $transaction);
                 $this->assertSame($this->throwable, $throwable);
                 $this->assertSame($this->attempt, $attempt);
+                $this->assertSame($this->modelManager, $modelManager);
                 $this->transaction->setMetadata(
                     'init',
                     $this->transaction->getMetadata('init') + 10
@@ -64,19 +69,19 @@ class RetryPolicyTest extends TestCase
     {
         $this->assertSame(1, $this->attempt);
         $this->assertSame(0, $this->transaction->getMetadata('init'));
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(10, $this->transaction->getMetadata('init'));
 
         $this->attempt++;
         $this->assertSame(2, $this->attempt);
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(20, $this->transaction->getMetadata('init'));
 
         $this->attempt++;
         $this->transaction->setMetadata('retry', false);
 
         $this->assertSame(3, $this->attempt);
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(20, $this->transaction->getMetadata('init'));
     }
 
@@ -84,22 +89,22 @@ class RetryPolicyTest extends TestCase
     {
         $this->assertSame(1, $this->attempt);
         $this->assertSame(0, $this->transaction->getMetadata('init'));
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(10, $this->transaction->getMetadata('init'));
 
         $this->attempt++;
         $this->assertSame(2, $this->attempt);
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(20, $this->transaction->getMetadata('init'));
 
         $this->attempt++;
         $this->assertSame(3, $this->attempt);
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(30, $this->transaction->getMetadata('init'));
 
         $this->attempt++;
         $this->assertSame(4, $this->attempt);
-        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $this->policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertSame(30, $this->transaction->getMetadata('init'));
     }
 
@@ -107,8 +112,8 @@ class RetryPolicyTest extends TestCase
     {
         $policy = new RetryPolicy(null, null, 3, 1100000);
         $time = time();
-        $policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
-        $policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt);
+        $policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
+        $policy->runBeforeRetry($this->transaction, $this->throwable, $this->attempt, $this->modelManager);
         $this->assertGreaterThanOrEqual(2, time() - $time);
     }
 }

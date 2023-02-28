@@ -27,23 +27,23 @@ class RetryPolicy
         $this->beforeRetryCallable = $beforeRetryCallable ?? fn() => true;
     }
 
-    public function runBeforeRetry(Transaction $transaction, Throwable $throwable, int $attempt): bool
+    public function runBeforeRetry(Transaction $transaction, Throwable $throwable, int $attempt, ModelManager $modelManager): bool
     {
-        if ($this->isRetryRequired($transaction, $throwable, $attempt)) {
+        if ($this->isRetryRequired($transaction, $throwable, $attempt, $modelManager)) {
             usleep($this->delay);
-            ($this->beforeRetryCallable)($transaction, $throwable, $attempt);
+            ($this->beforeRetryCallable)($transaction, $throwable, $attempt, $modelManager);
             return true;
         }
         return false;
     }
 
-    private function isRetryRequired(Transaction $transaction, Throwable $throwable, int $attempt): bool
+    private function isRetryRequired(Transaction $transaction, Throwable $throwable, int $attempt, ModelManager $modelManager): bool
     {
         if ($attempt > $this->retries) {
             return false;
         }
 
-        return ($this->isRetryRequiredCallable)($transaction, $throwable, $attempt);
+        return ($this->isRetryRequiredCallable)($transaction, $throwable, $attempt, $modelManager);
     }
 
 }
