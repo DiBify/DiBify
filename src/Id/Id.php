@@ -51,7 +51,7 @@ class Id implements JsonSerializable
     }
 
     /**
-     * @param Id | ModelInterface | int | string $modelOrId
+     * @param ModelInterface|Reference|Id|string|int $modelOrId
      * @return bool
      */
     public function isEqual(ModelInterface|Reference|Id|string|int $modelOrId): bool
@@ -79,6 +79,16 @@ class Id implements JsonSerializable
         }
 
         return false;
+    }
+
+    /**
+     * WARNING! You should call this method only if you exactly know what do you do
+     * @internal
+     * @return void
+     */
+    public function reset(): void
+    {
+        $this->value = null;
     }
 
     public function __toString(): string
