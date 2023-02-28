@@ -94,6 +94,11 @@ class ModelManager implements FreeUpMemoryInterface
         return $this->locker;
     }
 
+    public function getModelClasses(): array
+    {
+        return array_keys($this->configManager->getModelClasses());
+    }
+
     /**
      * @param ModelInterface|Reference|string $modelObjectOrClassOrAlias
      * @return Repository
