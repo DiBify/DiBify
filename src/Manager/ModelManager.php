@@ -57,7 +57,7 @@ class ModelManager implements FreeUpMemoryInterface
         ?callable $onBeforeCommit,
         ?callable $onAfterCommit,
         ?callable $onCommitException,
-        RetryPolicy $retryPolicy = null
+        RetryPolicy $retryPolicy = null,
     )
     {
         $this->configManager = $configManager;
@@ -74,7 +74,8 @@ class ModelManager implements FreeUpMemoryInterface
         LockerInterface $locker,
         callable $onBeforeCommit = null,
         callable $onAfterCommit = null,
-        callable $onCommitException = null
+        callable $onCommitException = null,
+        RetryPolicy $retryPolicy = null,
     ): self
     {
         static::$instance = new self(
@@ -82,7 +83,8 @@ class ModelManager implements FreeUpMemoryInterface
             $locker,
             $onBeforeCommit,
             $onAfterCommit,
-            $onCommitException
+            $onCommitException,
+            $retryPolicy,
         );
         return static::$instance;
     }
