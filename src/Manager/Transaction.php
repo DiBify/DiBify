@@ -70,12 +70,12 @@ class Transaction
     }
 
     /**
-     * @param string|null $modelClass
+     * @param string ...$modelClasses
      * @return ModelInterface[]
      */
-    public function getPersisted(string $modelClass = null): array
+    public function getPersisted(string ...$modelClasses): array
     {
-        return $this->filter($this->persisted, $modelClass);
+        return $this->filter($this->persisted, ...$modelClasses);
     }
 
     public function getPersistedOne(string $modelClass = null): ?ModelInterface
@@ -127,12 +127,12 @@ class Transaction
     }
 
     /**
-     * @param string|null $modelClass
+     * @param string ...$modelClasses
      * @return ModelInterface[]
      */
-    public function getDeleted(string $modelClass = null): array
+    public function getDeleted(string ...$modelClasses): array
     {
-        return $this->filter($this->deleted, $modelClass);
+        return $this->filter($this->deleted, ...$modelClasses);
     }
 
     public function getDeletedOne(string $modelClass = null): ?ModelInterface
@@ -199,19 +199,19 @@ class Transaction
     }
 
     /**
-     * @param ModelInterface[] $models
-     * @param string|null $modelClass
-     * @return ModelInterface[]
+     * @param array $models
+     * @param string ...$modelClasses
+     * @return array
      */
-    private function filter(array $models, string $modelClass = null): array
+    private function filter(array $models, string ...$modelClasses): array
     {
-        if ($modelClass === null) {
+        if (count($modelClasses) === 0) {
             return array_values($models);
         }
 
         return array_values(
-            array_filter($models, function (ModelInterface $model) use ($modelClass) {
-            return get_class($model) === $modelClass;
+            array_filter($models, function (ModelInterface $model) use ($modelClasses) {
+            return in_array(get_class($model), $modelClasses);
         }));
     }
 
