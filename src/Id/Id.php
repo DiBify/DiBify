@@ -51,11 +51,15 @@ class Id implements JsonSerializable
     }
 
     /**
-     * @param ModelInterface|Reference|Id|string|int $modelOrId
+     * @param ModelInterface|Reference|Id|string|int|null $modelOrId
      * @return bool
      */
-    public function isEqual(ModelInterface|Reference|Id|string|int $modelOrId): bool
+    public function isEqual(ModelInterface|Reference|Id|string|int|null $modelOrId): bool
     {
+        if (null === $modelOrId) {
+            return false;
+        }
+
         if ($modelOrId instanceof self) {
             if ($this->isAssigned()) {
                 return (string) $modelOrId === (string) $this;
