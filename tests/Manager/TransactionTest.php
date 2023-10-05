@@ -95,6 +95,11 @@ class TransactionTest extends TestCase
         $this->assertNotEmpty((string)$this->transaction->id());
     }
 
+    public function testGetModels(): void
+    {
+        $this->assertSame([...$this->persisted, ...$this->deleted], $this->transaction->getModels());
+    }
+
     public function testGetPersisted(): void
     {
         $this->assertSame($this->persisted, $this->transaction->getPersisted());

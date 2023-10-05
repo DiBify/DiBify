@@ -70,6 +70,14 @@ class Transaction
     }
 
     /**
+     * @return ModelInterface[]
+     */
+    public function getModels(): array
+    {
+        return [...array_values($this->persisted), ...array_values($this->deleted)];
+    }
+
+    /**
      * @param string ...$modelClasses
      * @return ModelInterface[]
      */

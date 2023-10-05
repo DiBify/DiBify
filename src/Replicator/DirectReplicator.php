@@ -68,6 +68,16 @@ class DirectReplicator implements ReplicatorInterface
         }
     }
 
+    public function onBeforeCommit(): void
+    {
+        return;
+    }
+
+    public function onAfterCommit(): void
+    {
+        return;
+    }
+
     public function freeUpMemory(): void
     {
         $this->primary->freeUpMemory();

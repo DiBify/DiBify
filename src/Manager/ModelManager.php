@@ -273,13 +273,21 @@ class ModelManager implements FreeUpMemoryInterface
             }
         }
 
+        $models = $transaction->getModels();
+
+        //Replicator::onAfterCommit
+        $modelClasses = $this->getUniqueModelClasses(...$models);
+        foreach ($modelClasses as $modelClass) {
+            $replicator = $this->getRepository($modelClass)->getReplicator();
+            $replicator->onBeforeCommit();
+        }
+
         ($this->onBeforeCommit)($transaction);
-        $models = array_merge($transaction->getPersisted(), $transaction->getDeleted());
 
         $retryPolicy = $transaction->getRetryPolicy() ?? $this->retryPolicy;
 
         try {
-            $this->commitInternal($transaction, $lock, ...$models);
+            $this->commitInternal($transaction, $lock);
             return;
         } catch (Throwable $throwable) {
             if (!$retryPolicy) {
@@ -295,7 +303,7 @@ class ModelManager implements FreeUpMemoryInterface
         $attempt = 1;
         while ($retryPolicy->runBeforeRetry($transaction, $throwable, $attempt, $this)) {
             try {
-                $this->commitInternal($transaction, $lock, ...$models);
+                $this->commitInternal($transaction, $lock);
                 return;
             } catch (Throwable $throwable) {
                 $attempt++;
@@ -312,7 +320,6 @@ class ModelManager implements FreeUpMemoryInterface
     /**
      * @param Transaction $transaction
      * @param Lock|null $lock
-     * @param ModelInterface ...$models
      * @return void
      * @throws DuplicateModelException
      * @throws InvalidArgumentException
@@ -322,19 +329,31 @@ class ModelManager implements FreeUpMemoryInterface
      * @throws Throwable
      * @throws UnknownModelException
      */
-    protected function commitInternal(Transaction $transaction, ?Lock $lock, ModelInterface ...$models): void
+    protected function commitInternal(Transaction $transaction, ?Lock $lock): void
     {
         try {
+            $models = $transaction->getModels();
             $this->lock($models, $lock);
 
-            $modelClasses = array_unique(array_map('get_class',$models));
+            $modelClasses = $this->getUniqueModelClasses(...$models);
             foreach ($modelClasses as $modelClass) {
                 $this->getRepository($modelClass)->commit($transaction);
             }
 
             ($this->onAfterCommit)($transaction);
+            foreach ($transaction->getPersisted() as $model) {
+                if ($model instanceof ModelAfterCommitEventInterface) {
+                    $model->onAfterCommit();
+                }
+            }
 
-            //onAfterCommit
+            //Replicator::onAfterCommit
+            foreach ($modelClasses as $modelClass) {
+                $replicator = $this->getRepository($modelClass)->getReplicator();
+                $replicator->onAfterCommit();
+            }
+
+            //Model::onAfterCommit
             foreach ($transaction->getPersisted() as $model) {
                 if ($model instanceof ModelAfterCommitEventInterface) {
                     $model->onAfterCommit();
@@ -395,6 +414,11 @@ class ModelManager implements FreeUpMemoryInterface
                 $this->getLocker()->unlock($model, $lock);
             }
         }
+    }
+
+    protected function getUniqueModelClasses(ModelInterface ...$models): array
+    {
+        return array_unique(array_map('get_class',$models));
     }
 
     public static function getScope(): ?string

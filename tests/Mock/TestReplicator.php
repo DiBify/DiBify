@@ -16,6 +16,9 @@ use DiBify\DiBify\Repository\Storage\StorageInterface;
 class TestReplicator implements ReplicatorInterface
 {
 
+    public int $onBeforeCommit = 0;
+    public int $onAfterCommit = 0;
+
     /**
      * @var StorageInterface|null
      */
@@ -59,6 +62,16 @@ class TestReplicator implements ReplicatorInterface
     public function delete(string $id, Transaction $transaction): void
     {
         return;
+    }
+
+    public function onBeforeCommit(): void
+    {
+        $this->onBeforeCommit++;
+    }
+
+    public function onAfterCommit(): void
+    {
+        $this->onAfterCommit++;
     }
 
     public function freeUpMemory(): void

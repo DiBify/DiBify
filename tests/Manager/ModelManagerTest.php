@@ -320,6 +320,31 @@ class ModelManagerTest extends TestCase
         $this->assertTrue($model->onAfterCommit);
     }
 
+    public function testCommitReplicatorEvents(): void
+    {
+        $before = 0;
+        $after = 0;
+        $this->replicator_1->method('onBeforeCommit')->willReturnCallback(function () use (&$before) {
+            $before = -1;
+        });
+
+        $this->replicator_1->method('onAfterCommit')->willReturnCallback(function () use (&$after) {
+            $after = 1;
+        });
+
+        $model = new TestModel_1();
+
+        $transaction = new Transaction();
+        $transaction->persists($model);
+
+        $this->assertSame(0, $before);
+        $this->assertSame(0, $after);
+        $this->manager->commit($transaction);
+
+        $this->assertSame(-1, $before);
+        $this->assertSame(1, $after);
+    }
+
     public function testCommitGlobalRetryPolicy(): void
     {
         $attempt = 0;

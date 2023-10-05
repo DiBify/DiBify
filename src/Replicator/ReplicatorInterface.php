@@ -39,4 +39,8 @@ interface ReplicatorInterface extends FreeUpMemoryInterface
 
     public function delete(string $id, Transaction $transaction): void;
 
+    public function onBeforeCommit(): void;
+
+    public function onAfterCommit(): void;
+
 }
