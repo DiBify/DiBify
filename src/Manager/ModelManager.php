@@ -341,11 +341,6 @@ class ModelManager implements FreeUpMemoryInterface
             }
 
             ($this->onAfterCommit)($transaction);
-            foreach ($transaction->getPersisted() as $model) {
-                if ($model instanceof ModelAfterCommitEventInterface) {
-                    $model->onAfterCommit();
-                }
-            }
 
             //Replicator::onAfterCommit
             foreach ($modelClasses as $modelClass) {
