@@ -76,7 +76,6 @@ class RepositoryTest extends TestCase
         unset($this->storage->data[3]);
 
         $this->assertSame($model_1, $this->repo->findById(1));
-        $this->assertNull($this->repo->findById(3));
 
         $changes = $this->repo->refresh($model_1, $model_2, $model_3);
 

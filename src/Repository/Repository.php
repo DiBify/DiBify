@@ -24,8 +24,8 @@ use SplObjectStorage;
 abstract class Repository
 {
 
-    /** @var ModelInterface[] */
-    protected array $registered;
+    /** @var ModelInterface[][] */
+    protected array $registered = [];
 
     protected ReplicatorInterface $replicator;
 
@@ -47,8 +47,15 @@ abstract class Repository
      */
     public function findById($id, Exception $notFoundException = null): ?ModelInterface
     {
+        $scalarId = IdHelper::scalarizeOne($id);
+        $registered = $this->getRegisteredByIds($scalarId);
+
+        if (isset($registered[$scalarId])) {
+            return $registered[$scalarId];
+        }
+
         $storage = $this->replicator->getPrimary();
-        $data = $storage->findById((string) $id);
+        $data = $storage->findById($scalarId);
         if (is_null($data)) {
             if ($notFoundException) {
                 throw $notFoundException;
@@ -67,8 +74,15 @@ abstract class Repository
      */
     public function findByIds($ids): array
     {
+        $scalarIds = IdHelper::scalarizeMany(...$ids);
+        $registered = $this->getRegisteredByIds(...$scalarIds);
+
+        if (count($ids) === count($scalarIds)) {
+            return $registered;
+        }
+
         $storage = $this->replicator->getPrimary();
-        $array = $storage->findByIds(IdHelper::scalarizeMany(...$ids));
+        $array = $storage->findByIds($scalarIds);
         return $this->populateMany($array);
     }
 
@@ -191,6 +205,23 @@ abstract class Repository
     protected function isRegistered(ModelInterface $model): bool
     {
         return isset($this->registered[get_class($model)][(string) $model->id()]);
+    }
+
+    /**
+     * @param string ...$ids
+     * @return ModelInterface[]
+     */
+    protected function getRegisteredByIds(string ...$ids): array
+    {
+        $result = [];
+        foreach ($this->registered as $models) {
+            foreach ($models as $id => $model) {
+                if (in_array($id, $ids)) {
+                    $result[$id] = $model;
+                }
+            }
+        }
+        return $result;
     }
 
     /**
