@@ -77,7 +77,7 @@ abstract class Repository
         $scalarIds = IdHelper::scalarizeMany(...$ids);
         $registered = $this->getRegisteredByIds(...$scalarIds);
 
-        if (count($ids) === count($scalarIds)) {
+        if (count($ids) === count($registered)) {
             return $registered;
         }
 
