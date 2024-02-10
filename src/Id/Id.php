@@ -7,6 +7,7 @@
 namespace DiBify\DiBify\Id;
 
 
+use DiBify\DiBify\Exceptions\NotPermanentIdException;
 use DiBify\DiBify\Model\ModelInterface;
 use DiBify\DiBify\Model\Reference;
 use JsonSerializable;
@@ -31,6 +32,13 @@ class Id implements JsonSerializable
     public function isAssigned(): bool
     {
         return $this->value !== null;
+    }
+
+    public function assertIsAssigned(): void
+    {
+        if (!$this->isAssigned()) {
+            throw new NotPermanentIdException('Id object has no assigned id value');
+        }
     }
 
     /**
