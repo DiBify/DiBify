@@ -63,8 +63,12 @@ class ModelMapper extends ObjectMapper
         }
 
         $data->body[$this->idProperty] = $data->id;
-        $model = parent::deserialize($data->body);
-        unset($data->body[$this->idProperty]);
-        return $model;
+        try {
+            $model = parent::deserialize($data->body);
+            unset($data->body[$this->idProperty]);
+            return $model;
+        } catch (SerializerException $exception) {
+            throw new SerializerException("Can not deserialize model with id '{$data->id}'", 0, $exception);
+        }
     }
 }
