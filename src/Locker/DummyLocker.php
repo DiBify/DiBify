@@ -6,6 +6,7 @@ namespace DiBify\DiBify\Locker;
 
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Model\ModelInterface;
+use DiBify\DiBify\Model\Reference;
 use SplObjectStorage;
 use Throwable;
 
@@ -90,8 +91,12 @@ class DummyLocker implements LockerInterface
         return true;
     }
 
-    public function isLockedFor(ModelInterface $model, Lock $lock): bool
+    public function isLockedFor(ModelInterface|Reference $model, Lock $lock): bool
     {
+        if (!($model instanceof ModelInterface)) {
+            $model = $model->getModel();
+        }
+
         if (!isset($this->locks[$model])) {
             return false;
         }
@@ -109,8 +114,12 @@ class DummyLocker implements LockerInterface
         return !$lock->isCompatible($current);
     }
 
-    public function getLock(ModelInterface $model): ?Lock
+    public function getLock(ModelInterface|Reference $model): ?Lock
     {
+        if (!($model instanceof ModelInterface)) {
+            $model = $model->getModel();
+        }
+
         $data = $this->locks[$model] ?? null;
 
         if (is_null($data)) {
