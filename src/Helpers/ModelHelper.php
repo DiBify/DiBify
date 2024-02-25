@@ -9,7 +9,7 @@ namespace DiBify\DiBify\Helpers;
 
 
 use DiBify\DiBify\Exceptions\DuplicateModelException;
-use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\UnassignedIdException;
 use DiBify\DiBify\Model\ModelInterface;
 
 class ModelHelper
@@ -18,14 +18,14 @@ class ModelHelper
     /**
      * @param ModelInterface[] $models
      * @return ModelInterface[]
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws DuplicateModelException
      */
     public static function indexById(ModelInterface ...$models): array
     {
         $indexed = self::indexBy(function (ModelInterface $model) {
             if (!$model->id()->isAssigned()) {
-                throw new NotPermanentIdException('Array of models can not be indexed by non-permanent id');
+                throw new UnassignedIdException('Array of models can not be indexed by non-permanent id');
             }
             return (string)$model->id();
         }, ...$models);

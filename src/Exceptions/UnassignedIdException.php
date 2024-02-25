@@ -9,7 +9,7 @@ namespace DiBify\DiBify\Exceptions;
 
 use Exception;
 
-class NotPermanentIdException extends Exception implements DiBifyExceptionInterface
+class UnassignedIdException extends Exception implements DiBifyExceptionInterface
 {
 
 }

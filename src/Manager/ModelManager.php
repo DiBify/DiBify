@@ -11,7 +11,7 @@ use DiBify\DiBify\Exceptions\DuplicateModelException;
 use DiBify\DiBify\Exceptions\InvalidArgumentException;
 use DiBify\DiBify\Exceptions\LockedModelException;
 use DiBify\DiBify\Exceptions\ModelRefreshException;
-use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\UnassignedIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Exceptions\UnknownModelException;
 use DiBify\DiBify\Id\Id;
@@ -206,7 +206,7 @@ class ModelManager implements FreeUpMemoryInterface
      * @throws DuplicateModelException
      * @throws InvalidArgumentException
      * @throws ModelRefreshException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      * @throws UnknownModelException
      */
@@ -227,7 +227,7 @@ class ModelManager implements FreeUpMemoryInterface
      * @return SplObjectStorage
      * @throws DuplicateModelException
      * @throws InvalidArgumentException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      * @throws UnknownModelException
      */
@@ -255,7 +255,7 @@ class ModelManager implements FreeUpMemoryInterface
      * @throws Throwable
      * @throws UnknownModelException
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     public function commit(Transaction $transaction, Lock $lock = null): void
@@ -324,7 +324,7 @@ class ModelManager implements FreeUpMemoryInterface
      * @throws DuplicateModelException
      * @throws InvalidArgumentException
      * @throws LockedModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      * @throws Throwable
      * @throws UnknownModelException

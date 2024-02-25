@@ -7,7 +7,7 @@
 namespace DiBify\DiBify\Repository;
 
 use DiBify\DiBify\Exceptions\DuplicateModelException;
-use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\UnassignedIdException;
 use DiBify\DiBify\Exceptions\SerializerException;
 use DiBify\DiBify\Helpers\IdHelper;
 use DiBify\DiBify\Helpers\ModelHelper;
@@ -69,7 +69,7 @@ abstract class Repository
      * @param Id[]|array $ids
      * @return ModelInterface[]
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     public function findByIds($ids): array
@@ -90,7 +90,7 @@ abstract class Repository
      * @param ModelInterface[] $models
      * @return SplObjectStorage
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     public function refresh(ModelInterface ...$models): SplObjectStorage
@@ -125,7 +125,7 @@ abstract class Repository
     /**
      * @param Transaction $transaction
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     public function commit(Transaction $transaction): void
@@ -166,7 +166,7 @@ abstract class Repository
      * @param StorageData $data
      * @return ModelInterface
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     protected function populateOne(StorageData $data): ModelInterface
@@ -186,7 +186,7 @@ abstract class Repository
      * @param StorageData[] $array
      * @return ModelInterface[]
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      * @throws SerializerException
      */
     protected function populateMany(array $array): array
@@ -228,12 +228,12 @@ abstract class Repository
      * @param ModelInterface $model
      * @param bool $refresh
      * @throws DuplicateModelException
-     * @throws NotPermanentIdException
+     * @throws UnassignedIdException
      */
     protected function register(ModelInterface $model, bool $refresh = false): void
     {
         if (!$model->id()->isAssigned()) {
-            throw new NotPermanentIdException('Model without permanent id can not be registered');
+            throw new UnassignedIdException('Model without permanent id can not be registered');
         }
 
         $class = get_class($model);

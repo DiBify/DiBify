@@ -7,7 +7,7 @@
 namespace DiBify\DiBify\Id;
 
 
-use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\UnassignedIdException;
 use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Model\Reference;
 use PHPUnit\Framework\TestCase;
@@ -88,7 +88,7 @@ class IdTest extends TestCase
         $id_assigned->assertIsAssigned();
 
         $id_empty = new Id();
-        $this->expectException(NotPermanentIdException::class);
+        $this->expectException(UnassignedIdException::class);
         $id_empty->assertIsAssigned();
     }
     

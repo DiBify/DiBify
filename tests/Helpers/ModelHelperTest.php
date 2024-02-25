@@ -8,7 +8,7 @@
 namespace DiBify\DiBify\Helpers;
 
 use DiBify\DiBify\Exceptions\DuplicateModelException;
-use DiBify\DiBify\Exceptions\NotPermanentIdException;
+use DiBify\DiBify\Exceptions\UnassignedIdException;
 use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Mock\TestModel_2;
 use DiBify\DiBify\Mock\TestModel_3;
@@ -36,7 +36,7 @@ class ModelHelperTest extends TestCase
 
     public function testIndexByIdWithNonPermanentId()
     {
-        $this->expectException(NotPermanentIdException::class);
+        $this->expectException(UnassignedIdException::class);
         ModelHelper::indexById(...([
             new TestModel_1()
         ]));
