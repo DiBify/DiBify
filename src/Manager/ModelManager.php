@@ -275,11 +275,11 @@ class ModelManager implements FreeUpMemoryInterface
 
         $models = $transaction->getModels();
 
-        //Replicator::onAfterCommit
+        //Replicator::onBeforeCommit
         $modelClasses = $this->getUniqueModelClasses(...$models);
         foreach ($modelClasses as $modelClass) {
             $replicator = $this->getRepository($modelClass)->getReplicator();
-            $replicator->onBeforeCommit();
+            $replicator->onBeforeCommit($transaction);
         }
 
         ($this->onBeforeCommit)($transaction);
@@ -345,7 +345,7 @@ class ModelManager implements FreeUpMemoryInterface
             //Replicator::onAfterCommit
             foreach ($modelClasses as $modelClass) {
                 $replicator = $this->getRepository($modelClass)->getReplicator();
-                $replicator->onAfterCommit();
+                $replicator->onAfterCommit($transaction);
             }
 
             //Model::onAfterCommit

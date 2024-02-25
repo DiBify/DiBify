@@ -26,12 +26,12 @@ interface ReplicatorInterface extends FreeUpMemoryInterface
      * @param string $name
      * @return StorageInterface
      */
-    public function getSlaveByName(string $name): StorageInterface;
+    public function getSecondaryByName(string $name): StorageInterface;
 
     /**
      * @return StorageInterface[]
      */
-    public function getSlaves(): array;
+    public function getSecondaries(): array;
 
     public function insert(StorageData $data, Transaction $transaction): void;
 
@@ -39,8 +39,8 @@ interface ReplicatorInterface extends FreeUpMemoryInterface
 
     public function delete(string $id, Transaction $transaction): void;
 
-    public function onBeforeCommit(): void;
+    public function onBeforeCommit(Transaction $transaction): void;
 
-    public function onAfterCommit(): void;
+    public function onAfterCommit(Transaction $transaction): void;
 
 }

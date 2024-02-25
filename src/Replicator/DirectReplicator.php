@@ -18,12 +18,12 @@ class DirectReplicator implements ReplicatorInterface
     private StorageInterface $primary;
 
     /** @var StorageInterface[] */
-    private array $slaves;
+    private array $secondaries;
 
-    public function __construct(StorageInterface $primary, array $slaves = [])
+    public function __construct(StorageInterface $primary, array $secondaries = [])
     {
         $this->primary = $primary;
-        $this->slaves = $slaves;
+        $this->secondaries = $secondaries;
     }
 
     public function getPrimary(): StorageInterface
@@ -34,20 +34,20 @@ class DirectReplicator implements ReplicatorInterface
     /**
      * @inheritDoc
      */
-    public function getSlaveByName(string $name): StorageInterface
+    public function getSecondaryByName(string $name): StorageInterface
     {
-        return $this->slaves[$name];
+        return $this->secondaries[$name];
     }
 
-    public function getSlaves(): array
+    public function getSecondaries(): array
     {
-        return $this->slaves;
+        return $this->secondaries;
     }
 
     public function insert(StorageData $data, Transaction $transaction): void
     {
         $this->primary->insert($data);
-        foreach ($this->slaves as $slave) {
+        foreach ($this->secondaries as $slave) {
             $slave->insert($data);
         }
     }
@@ -55,7 +55,7 @@ class DirectReplicator implements ReplicatorInterface
     public function update(StorageData $data, Transaction $transaction): void
     {
         $this->primary->update($data);
-        foreach ($this->slaves as $slave) {
+        foreach ($this->secondaries as $slave) {
             $slave->update($data);
         }
     }
@@ -63,17 +63,17 @@ class DirectReplicator implements ReplicatorInterface
     public function delete(string $id, Transaction $transaction): void
     {
         $this->primary->delete($id);
-        foreach ($this->slaves as $slave) {
+        foreach ($this->secondaries as $slave) {
             $slave->delete($id);
         }
     }
 
-    public function onBeforeCommit(): void
+    public function onBeforeCommit(Transaction $transaction): void
     {
         return;
     }
 
-    public function onAfterCommit(): void
+    public function onAfterCommit(Transaction $transaction): void
     {
         return;
     }
@@ -81,8 +81,8 @@ class DirectReplicator implements ReplicatorInterface
     public function freeUpMemory(): void
     {
         $this->primary->freeUpMemory();
-        foreach ($this->slaves as $slave) {
-            $slave->freeUpMemory();
+        foreach ($this->secondaries as $secondary) {
+            $secondary->freeUpMemory();
         }
     }
 }

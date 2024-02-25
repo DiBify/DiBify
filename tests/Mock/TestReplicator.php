@@ -26,12 +26,12 @@ class TestReplicator implements ReplicatorInterface
     /**
      * @var StorageInterface[]
      */
-    private array $slaves;
+    private array $secondaries;
 
-    public function __construct(StorageInterface $primary = null, array $slaves = [])
+    public function __construct(StorageInterface $primary = null, array $secondaries = [])
     {
         $this->primary = $primary;
-        $this->slaves = $slaves;
+        $this->secondaries = $secondaries;
     }
 
     public function getPrimary(): StorageInterface
@@ -39,14 +39,14 @@ class TestReplicator implements ReplicatorInterface
         return $this->primary;
     }
 
-    public function getSlaveByName(string $name): StorageInterface
+    public function getSecondaryByName(string $name): StorageInterface
     {
         return $this->primary;
     }
 
-    public function getSlaves(): array
+    public function getSecondaries(): array
     {
-        return $this->slaves;
+        return $this->secondaries;
     }
 
     public function insert(StorageData $data, Transaction $transaction): void
@@ -64,12 +64,12 @@ class TestReplicator implements ReplicatorInterface
         return;
     }
 
-    public function onBeforeCommit(): void
+    public function onBeforeCommit(Transaction $transaction): void
     {
         $this->onBeforeCommit++;
     }
 
-    public function onAfterCommit(): void
+    public function onAfterCommit(Transaction $transaction): void
     {
         $this->onAfterCommit++;
     }
@@ -77,8 +77,8 @@ class TestReplicator implements ReplicatorInterface
     public function freeUpMemory(): void
     {
         $this->primary->freeUpMemory();
-        foreach ($this->slaves as $slave) {
-            $slave->freeUpMemory();
+        foreach ($this->secondaries as $secondary) {
+            $secondary->freeUpMemory();
         }
     }
 }
