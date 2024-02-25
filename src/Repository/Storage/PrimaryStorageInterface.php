@@ -20,7 +20,7 @@ interface PrimaryStorageInterface extends StorageInterface
 
     public function findForReplicationSync(DateTimeImmutable $gte, int $batchSize): Generator;
 
-    public function findCountForReplicationSync(DateTimeImmutable $gte): int;
+    public function countForReplicationSync(DateTimeImmutable $gte): int;
 
     public function getVersionField(): string;
 
