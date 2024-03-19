@@ -133,7 +133,7 @@ abstract class Repository
         foreach ($this->classes() as $class) {
             foreach ($transaction->getPersisted($class) as $model) {
                 $data = $this->getMapper()->serialize($model);
-                if ($this->isRegistered($model)) {
+                if ($this->isRegistered($model, true)) {
                     $this->replicator->update($data, $transaction);
                 } else {
                     $this->replicator->insert($data, $transaction);
@@ -200,12 +200,13 @@ abstract class Repository
 
     /**
      * @param ModelInterface $model
+     * @param bool $strict
      * @return bool
      */
-    protected function isRegistered(ModelInterface $model): bool
+    protected function isRegistered(ModelInterface $model, bool $strict = false): bool
     {
         $registered = $this->registered[get_class($model)][(string) $model->id()] ?? null;
-        return $registered === $model;
+        return $strict ? $registered === $model : !is_null($registered);
     }
 
     /**
