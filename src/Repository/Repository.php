@@ -204,7 +204,8 @@ abstract class Repository
      */
     protected function isRegistered(ModelInterface $model): bool
     {
-        return isset($this->registered[get_class($model)][(string) $model->id()]);
+        $registered = $this->registered[get_class($model)][(string) $model->id()] ?? null;
+        return $registered === $model;
     }
 
     /**
