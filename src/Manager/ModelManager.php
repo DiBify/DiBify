@@ -282,6 +282,7 @@ class ModelManager implements FreeUpMemoryInterface
             $replicator->onBeforeCommit($transaction);
         }
 
+        $transaction->triggerEvent(TransactionEvent::BEFORE_COMMIT);
         ($this->onBeforeCommit)($transaction);
 
         $retryPolicy = $transaction->getRetryPolicy() ?? $this->retryPolicy;
@@ -355,12 +356,15 @@ class ModelManager implements FreeUpMemoryInterface
                 }
             }
 
+            $transaction->triggerEvent(TransactionEvent::AFTER_COMMIT);
+
             if ($lock instanceof ServiceLock) {
                 $this->unlock($models, $lock);
             }
 
         } catch (Throwable $exception) {
             ($this->onCommitException)($transaction, $exception);
+            $transaction->triggerEvent(TransactionEvent::COMMIT_EXCEPTION);
             throw $exception;
         }
     }

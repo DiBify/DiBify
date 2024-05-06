@@ -19,9 +19,9 @@ use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Mock\TestModel_2;
 use DiBify\DiBify\Mock\TestRepo_1;
 use DiBify\DiBify\Mock\TestRepo_2;
-use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\Reference;
 use DiBify\DiBify\Replicator\ReplicatorInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -345,6 +345,58 @@ class ModelManagerTest extends TestCase
         $this->assertSame(1, $after);
     }
 
+    public function testCommitTransactionBeforeAndAfterEvents(): void
+    {
+        $events = [
+            TransactionEvent::BEFORE_COMMIT->value => false,
+            TransactionEvent::AFTER_COMMIT->value => false,
+            TransactionEvent::COMMIT_EXCEPTION->value => false,
+        ];
+
+        $transaction = new Transaction();
+        foreach ($events as $event => $value) {
+            $transaction->addEventHandler(TransactionEvent::from($event), function () use (&$events, $event) {
+                $events[$event] = true;
+            });
+        }
+
+        foreach ($events as $event => $value) {
+            $this->assertFalse($value);
+        }
+
+        $this->manager->commit($transaction);
+        $this->assertTrue($events[TransactionEvent::BEFORE_COMMIT->value]);
+        $this->assertTrue($events[TransactionEvent::AFTER_COMMIT->value]);
+        $this->assertFalse($events[TransactionEvent::COMMIT_EXCEPTION->value]);
+    }
+
+    public function testCommitTransactionExceptionEvent(): void
+    {
+        $events = [
+            TransactionEvent::BEFORE_COMMIT->value => false,
+            TransactionEvent::AFTER_COMMIT->value => false,
+            TransactionEvent::COMMIT_EXCEPTION->value => false,
+        ];
+
+        $transaction = new Transaction([new TestModel_1('exception')]);
+        foreach ($events as $event => $value) {
+            $transaction->addEventHandler(TransactionEvent::from($event), function () use (&$events, $event) {
+                $events[$event] = true;
+            });
+        }
+
+        foreach ($events as $event => $value) {
+            $this->assertFalse($value);
+        }
+
+        try {
+            $this->manager->commit($transaction);
+        } catch (Throwable) {}
+        $this->assertTrue($events[TransactionEvent::BEFORE_COMMIT->value]);
+        $this->assertFalse($events[TransactionEvent::AFTER_COMMIT->value]);
+        $this->assertTrue($events[TransactionEvent::COMMIT_EXCEPTION->value]);
+    }
+
     public function testCommitGlobalRetryPolicy(): void
     {
         $attempt = 0;
@@ -358,7 +410,7 @@ class ModelManagerTest extends TestCase
 
         try {
             $this->manager->commit($transaction);
-        } catch (\Exception) {
+        } catch (Exception) {
             $this->assertSame(2, $attempt);
         }
 
@@ -368,7 +420,7 @@ class ModelManagerTest extends TestCase
         }, 5));
         try {
             $this->manager->commit($transaction);
-        } catch (\Exception) {
+        } catch (Exception) {
             $this->assertSame(5, $attempt);
         }
     }

@@ -465,4 +465,21 @@ class TransactionTest extends TestCase
         $this->assertSame('hello world', $this->transaction->getMetadata('key'));
     }
 
+    public function testEvents(): void
+    {
+        $value = false;
+        $handler = function () use (&$value) { $value = true; };
+        $this->transaction->addEventHandler(TransactionEvent::BEFORE_COMMIT, $handler);
+
+        $this->assertFalse($value);
+        $this->transaction->triggerEvent(TransactionEvent::AFTER_COMMIT);
+        $this->assertFalse($value);
+
+        $this->transaction->triggerEvent(TransactionEvent::BEFORE_COMMIT);
+        $this->assertTrue($value);
+        $value = false;
+        $this->transaction->triggerEvent(TransactionEvent::BEFORE_COMMIT);
+        $this->assertFalse($value);
+    }
+
 }

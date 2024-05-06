@@ -26,6 +26,9 @@ class Transaction
 
     protected array $metadata = [];
 
+    /** @var callable[][]  */
+    protected array $eventHandlers = [];
+
     private static SplObjectStorage $persistsWith;
 
     private static SplObjectStorage $deleteWith;
@@ -196,14 +199,27 @@ class Transaction
         return $this->retryPolicy;
     }
 
-    public function getMetadata(string $key)
+    public function getMetadata(string $key): mixed
     {
         return $this->metadata[$key] ?? null;
     }
 
-    public function setMetadata(string $key, $value)
+    public function setMetadata(string $key, $value): mixed
     {
         return $this->metadata[$key] = $value;
+    }
+
+    public function addEventHandler(TransactionEvent $event, callable $handler): void
+    {
+        $this->eventHandlers[$event->value][] = $handler;
+    }
+
+    public function triggerEvent(TransactionEvent $event): void
+    {
+        foreach ($this->eventHandlers[$event->value] as $handler) {
+            $handler();
+        }
+        $this->eventHandlers[$event->value] = [];
     }
 
     /**
