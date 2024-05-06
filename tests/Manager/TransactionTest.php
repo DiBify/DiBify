@@ -467,6 +467,11 @@ class TransactionTest extends TestCase
 
     public function testEvents(): void
     {
+        //Check warnings for empty handlers
+        $this->transaction->triggerEvent(TransactionEvent::BEFORE_COMMIT);
+        $this->transaction->triggerEvent(TransactionEvent::AFTER_COMMIT);
+        $this->transaction->triggerEvent(TransactionEvent::COMMIT_EXCEPTION);
+
         $value = false;
         $handler = function () use (&$value) { $value = true; };
         $this->transaction->addEventHandler(TransactionEvent::BEFORE_COMMIT, $handler);

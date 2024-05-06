@@ -216,7 +216,8 @@ class Transaction
 
     public function triggerEvent(TransactionEvent $event): void
     {
-        foreach ($this->eventHandlers[$event->value] as $handler) {
+        $handlers = $this->eventHandlers[$event->value] ?? [];
+        foreach ($handlers as $handler) {
             $handler();
         }
         $this->eventHandlers[$event->value] = [];
