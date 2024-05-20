@@ -393,7 +393,7 @@ class ModelManager implements FreeUpMemoryInterface
             $currentLock = $locker->getLock($model);
 
             if ($currentLock && !$lock) {
-                throw new LockedModelException('Model locked by somebody else');
+                throw new LockedModelException("Model locked by somebody else ({$currentLock->getLocker()})");
             }
 
             if ($lock && !$locker->lock($model, $lock)) {
