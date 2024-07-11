@@ -218,7 +218,7 @@ class Transaction
     {
         $handlers = $this->eventHandlers[$event->value] ?? [];
         foreach ($handlers as $handler) {
-            $handler();
+            $handler($this);
         }
         $this->eventHandlers[$event->value] = [];
     }
