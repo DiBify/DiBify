@@ -13,28 +13,28 @@ use DiBify\DiBify\Mock\ValueObject;
 class ValueObjectMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new ValueObject('qwerty'), 'qwerty']
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [new DateTime()]
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             ['qwerty', new ValueObject('qwerty')]
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [null],

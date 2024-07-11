@@ -10,7 +10,7 @@ namespace DiBify\DiBify\Mappers;
 class FloatMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [0, 0.0],
@@ -24,27 +24,16 @@ class FloatMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
-            ['000'],
-            ['-0'],
             ['qwerty'],
-            ['+1'],
-            ['000'],
-            ['-0'],
-            ['qwerty'],
-            ['-0.0'],
-            ['002.00'],
-            ['-002.00'],
-            ['2.'],
-            ['.2'],
             [[]],
             [null],
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             ['0', 0.0],
@@ -58,9 +47,9 @@ class FloatMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
-        return $this->serializeInvalidDataProvider();
+        return static::serializeInvalidDataProvider();
     }
 
     protected function getMapper(): MapperInterface

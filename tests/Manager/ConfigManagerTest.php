@@ -67,7 +67,7 @@ class ConfigManagerTest extends TestCase
         );
     }
 
-    public function getRepoDataProvider(): array
+    public static function getRepoDataProvider(): array
     {
         return [
             [TestModel_1::class, TestRepo_1::class, TestModel_1::class, 0],
@@ -137,7 +137,7 @@ class ConfigManagerTest extends TestCase
         $this->manager->getRepository(TestModel_3::class);
     }
 
-    public function getIdGeneratorDataProvider(): array
+    public static function getIdGeneratorDataProvider(): array
     {
         return [
             [TestModel_1::class, 1],

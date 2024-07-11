@@ -13,13 +13,13 @@ use PHPUnit\Framework\TestCase;
 abstract class MapperTestCase extends TestCase
 {
 
-    abstract public function serializeDataProvider(): array;
+    abstract public static function serializeDataProvider(): array;
 
-    abstract public function serializeInvalidDataProvider(): array;
+    abstract public static function serializeInvalidDataProvider(): array;
 
-    abstract public function deserializeDataProvider(): array;
+    abstract public static function deserializeDataProvider(): array;
 
-    abstract public function deserializeInvalidDataProvider(): array;
+    abstract public static function deserializeInvalidDataProvider(): array;
 
     /**
      * @param $input

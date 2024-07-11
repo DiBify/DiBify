@@ -14,6 +14,7 @@ use DiBify\DiBify\Mock\TestModel_3;
 use DiBify\DiBify\Model\ModelInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use TypeError;
 
 class TransactionTest extends TestCase
@@ -47,7 +48,7 @@ class TransactionTest extends TestCase
         $this->transaction = new Transaction($this->persisted, $this->deleted);
     }
 
-    public function invalidModelsProvider(): array
+    public static function invalidModelsProvider(): array
     {
         return [
             [
@@ -67,12 +68,12 @@ class TransactionTest extends TestCase
                 ],
             ],
             [
-                [$this],
+                [new stdClass()],
                 [],
             ],
             [
                 [],
-                [$this],
+                [new stdClass()],
             ],
         ];
     }

@@ -11,14 +11,14 @@ use DateTimeImmutable;
 class DateTimeMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new DateTimeImmutable("@1587420198"), 1587420198],
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             ["1587420198"],
@@ -29,7 +29,7 @@ class DateTimeMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             ['1587420198', new DateTimeImmutable("@1587420198")],
@@ -37,7 +37,7 @@ class DateTimeMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [null],

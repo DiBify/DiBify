@@ -14,7 +14,7 @@ use DiBify\DiBify\Mock\TestModel_3;
 
 class DeepIdentityMapperTest extends MapperTestCase
 {
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         $model_1 = new TestModel_1(1, 2, 3);
         $model_2 = new TestModel_2(4, 5, $model_1);
@@ -132,16 +132,15 @@ class DeepIdentityMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [tmpfile()],
-            [$this],
             [new TestModel_3()],
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         $model_1 = new TestModel_1(1, 2, 3);
         $model_2 = new TestModel_2(4, 5, $model_1);
@@ -259,7 +258,7 @@ class DeepIdentityMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [

@@ -27,7 +27,7 @@ class ModelMapperTest extends MapperTestCase
         );
     }
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new TestModel_1(1, 2, '3'), new StorageData('1', ['otherId' => '2', 'custom' => '3'])],
@@ -35,7 +35,7 @@ class ModelMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [null],
@@ -46,7 +46,7 @@ class ModelMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             [new StorageData('1', ['otherId' => '2', 'custom' => '3']), new TestModel_1(1, 2, '3')],
@@ -55,7 +55,7 @@ class ModelMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [null],

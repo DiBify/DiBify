@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class SortableUniqueIdGeneratorTest extends TestCase
 {
 
-    public function invokeDataProvider(): array
+    public static function invokeDataProvider(): array
     {
         return [
             [16, '', '~^[\da-z]{16}$~', null],
@@ -20,7 +20,7 @@ class SortableUniqueIdGeneratorTest extends TestCase
         ];
     }
 
-    public function generateDataProvider(): array
+    public static function generateDataProvider(): array
     {
         return [
             [16, '', '~^lb8igo5c[\da-z]{8}$~', 1670106792.000],
@@ -64,7 +64,7 @@ class SortableUniqueIdGeneratorTest extends TestCase
         );
     }
 
-    public function fixtureDataProvider(): array
+    public static function fixtureDataProvider(): array
     {
         return [
             [1670106792, 16, '', '~^lb8igo5clb8igo5c$~'],

@@ -12,7 +12,7 @@ use DiBify\DiBify\Model\Reference;
 class ReferenceMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [
@@ -22,7 +22,7 @@ class ReferenceMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [1],
@@ -34,7 +34,7 @@ class ReferenceMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             [
@@ -44,14 +44,14 @@ class ReferenceMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
-            ['id' => '1'],
-            ['alias' => 'model'],
-            ['id' => '1', 'alias' => null],
-            ['id' => null, 'alias' => 'model'],
-            ['id' => null, 'alias' => null],
+            [['id' => '1']],
+            [['alias' => 'model']],
+            [['id' => '1', 'alias' => null]],
+            [['id' => null, 'alias' => 'model']],
+            [['id' => null, 'alias' => null]],
             [1],
             ['string'],
             [null],

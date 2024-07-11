@@ -13,7 +13,7 @@ use DiBify\DiBify\Pool\IntPool;
 class PoolMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new FloatPool(100.1), ['current' => 100.1, 'pool' => 0.0]],
@@ -21,7 +21,7 @@ class PoolMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [new IntPool(100)],
@@ -29,7 +29,7 @@ class PoolMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             [100.1, new FloatPool(100.1)],
@@ -38,7 +38,7 @@ class PoolMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             ['hello'],

@@ -13,7 +13,7 @@ use Throwable;
 class IdMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new Id(1), '1'],
@@ -22,7 +22,7 @@ class IdMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [1],
@@ -40,7 +40,7 @@ class IdMapperTest extends MapperTestCase
         $this->getMapper()->serialize(new Id());
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             ['1', new Id(1)],
@@ -49,7 +49,7 @@ class IdMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [null],

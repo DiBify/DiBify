@@ -9,7 +9,7 @@ namespace DiBify\DiBify\Mappers;
 class ArrayMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [[1, 2, 3], [1, 2, 3]],
@@ -18,7 +18,7 @@ class ArrayMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [null],
@@ -29,14 +29,14 @@ class ArrayMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
-        return $this->serializeDataProvider();
+        return static::serializeDataProvider();
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
-        return $this->serializeInvalidDataProvider();
+        return static::serializeInvalidDataProvider();
     }
 
     protected function getMapper(): MapperInterface

@@ -9,7 +9,7 @@ namespace DiBify\DiBify\Mappers;
 class NullOrMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [null, null],
@@ -17,7 +17,7 @@ class NullOrMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             ['string'],
@@ -26,7 +26,7 @@ class NullOrMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             [null, null],
@@ -34,7 +34,7 @@ class NullOrMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             ['string'],

@@ -127,7 +127,7 @@ class ReferenceTest extends TestCase
         Reference::fromJson(json_encode($array));
     }
 
-    public function invalidReferenceDataProvider(): array
+    public static function invalidReferenceDataProvider(): array
     {
         return [
             [[]],

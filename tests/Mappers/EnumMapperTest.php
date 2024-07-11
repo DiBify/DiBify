@@ -21,7 +21,7 @@ class EnumMapperTest extends MapperTestCase
         $this->assertSame(StringMapper::getInstance(), $string->getMapper());
     }
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [MockEnum_1::key_1, 'value_1'],
@@ -29,7 +29,7 @@ class EnumMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [MockEnum_2::key_1],
@@ -42,7 +42,7 @@ class EnumMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             ['value_1', MockEnum_1::key_1],
@@ -50,7 +50,7 @@ class EnumMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             ['value_3'],

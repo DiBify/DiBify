@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class IdHelperTest extends TestCase
 {
 
-    public function idDataProvider(): array
+    public static function idDataProvider(): array
     {
         return [
             [new TestModel_1(1), '1'],

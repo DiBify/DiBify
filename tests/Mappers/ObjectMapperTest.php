@@ -11,7 +11,7 @@ use DiBify\DiBify\Mock\TestModel_1;
 class ObjectMapperTest extends MapperTestCase
 {
 
-    public function serializeDataProvider(): array
+    public static function serializeDataProvider(): array
     {
         return [
             [new TestModel_1(1, 2, '3'), ['id' => '1', 'otherId' => '2', 'custom' => '3']],
@@ -19,7 +19,7 @@ class ObjectMapperTest extends MapperTestCase
         ];
     }
 
-    public function serializeInvalidDataProvider(): array
+    public static function serializeInvalidDataProvider(): array
     {
         return [
             [null],
@@ -30,7 +30,7 @@ class ObjectMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeDataProvider(): array
+    public static function deserializeDataProvider(): array
     {
         return [
             [['id' => '1', 'otherId' => '2', 'custom' => '3'], new TestModel_1(1, 2, '3')],
@@ -39,7 +39,7 @@ class ObjectMapperTest extends MapperTestCase
         ];
     }
 
-    public function deserializeInvalidDataProvider(): array
+    public static function deserializeInvalidDataProvider(): array
     {
         return [
             [null],
