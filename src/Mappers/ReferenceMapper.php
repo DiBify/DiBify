@@ -36,7 +36,7 @@ class ReferenceMapper extends ObjectMapper
 
         $reference = Reference::create($data['alias'], $data['id']);
 
-        $isEager = is_bool($this->eager) ? $this->eager : ($this->eager)();
+        $isEager = is_bool($this->eager) ? $this->eager : ($this->eager)($this);
 
         if ($isEager) {
             Reference::preload($reference);
