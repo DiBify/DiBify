@@ -14,12 +14,12 @@ use DiBify\DiBify\Model\Reference;
 class ReferenceMapper extends ObjectMapper
 {
 
-    private bool $eager;
+    private mixed $eager;
 
     private static self $instanceEager;
     private static self $instanceLazy;
 
-    public function __construct(bool $eager = false)
+    public function __construct(callable|bool $eager = false)
     {
         $this->eager = $eager;
         parent::__construct(Reference::class, [
@@ -36,7 +36,9 @@ class ReferenceMapper extends ObjectMapper
 
         $reference = Reference::create($data['alias'], $data['id']);
 
-        if ($this->eager) {
+        $isEager = is_bool($this->eager) ? $this->eager : ($this->eager)();
+
+        if ($isEager) {
             Reference::preload($reference);
         }
 
