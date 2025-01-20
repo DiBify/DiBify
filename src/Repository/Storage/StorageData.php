@@ -20,6 +20,8 @@ class StorageData implements JsonSerializable
 
     public array $body;
 
+    public array $metadata = [];
+
     public function __construct(string $id, array $body, ?string $scope = null)
     {
         $this->scope = $scope ?? ModelManager::getScope();
