@@ -66,11 +66,6 @@ class ValueObjectMapper implements MapperInterface
      */
     public function deserialize($data)
     {
-        if (!is_scalar($data)) {
-            $type = gettype($data);
-            throw new SerializerException("Serialized data of {$this->classname} should be scalar, but '{$type}' type passed");
-        }
-
         $object = ReflectionHelper::newWithoutConstructor($this->classname);
 
         try {
