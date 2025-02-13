@@ -10,6 +10,7 @@ namespace DiBify\DiBify\Helpers;
 use DiBify\DiBify\Id\Id;
 use DiBify\DiBify\Mock\TestModel_1;
 use DiBify\DiBify\Model\Reference;
+use DiBify\DiBify\Repository\Storage\StorageData;
 use PHPUnit\Framework\TestCase;
 
 class IdHelperTest extends TestCase
@@ -21,6 +22,7 @@ class IdHelperTest extends TestCase
             [new TestModel_1(1), '1'],
             [Reference::create('model', 2), '2'],
             [new Id(3), '3'],
+            [new StorageData('8', []), '8'],
             [4, '4'],
         ];
     }
