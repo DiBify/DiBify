@@ -103,19 +103,11 @@ abstract class Repository
             $model = $models[$id];
             unset($models[$id]);
             $refreshed = $this->getMapper()->deserialize($storageData);
-
-            $modelHash = md5(var_export($model, true));
-            $refreshedHash = md5(var_export($refreshed, true));
-
-            if ($modelHash === $refreshedHash) {
-                $map[$model] = $model;
-            } else {
-                $map[$model] = $refreshed;
-                $this->register($refreshed, true);
-            }
+            $map[$model] = $refreshed;
+            $this->register($refreshed, true);
         }
 
-        foreach ($models as $id => $model) {
+        foreach ($models as $model) {
             $map[$model] = null;
         }
 
