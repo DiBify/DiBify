@@ -56,4 +56,10 @@ class IntPool implements PoolInterface
     {
         $this->pool-= (int) $value;
     }
+
+    public function merge(): void
+    {
+        $this->current = $this->getResult();
+        $this->pool = 0;
+    }
 }

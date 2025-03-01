@@ -14,6 +14,9 @@ use DiBify\DiBify\Pool\PoolInterface;
 class PoolMapper implements MapperInterface
 {
 
+    /** @var PoolInterface[]  */
+    protected static array $pools = [];
+
     private string $poolClass;
 
     private MapperInterface $mapper;
@@ -35,6 +38,8 @@ class PoolMapper implements MapperInterface
             $type = gettype($complex);
             throw new SerializerException("'{$this->poolClass}' expected, but '{$type}' type passed");
         }
+
+        self::$pools[] = $complex;
 
         return [
             'current' => $this->mapper->serialize($complex->getCurrent()),
@@ -61,6 +66,19 @@ class PoolMapper implements MapperInterface
 
         /** @var PoolInterface $pool */
         return new $class($current);
+    }
+
+    public static function merge(): void
+    {
+        foreach (self::$pools as $pool) {
+            $pool->merge();
+        }
+        self::$pools = [];
+    }
+
+    public static function freeUpMemory(): void
+    {
+        self::$pools = [];
     }
 
 }

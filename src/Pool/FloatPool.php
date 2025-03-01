@@ -56,4 +56,10 @@ class FloatPool implements PoolInterface
     {
         $this->pool-= (float) $value;
     }
+
+    public function merge(): void
+    {
+        $this->current = $this->getResult();
+        $this->pool = 0;
+    }
 }

@@ -54,4 +54,35 @@ class PoolMapperTest extends MapperTestCase
             new FloatMapper()
         );
     }
+
+    public function testMerge(): void
+    {
+        $pool = new FloatPool(100, 10);
+        $mapper = new class(FloatPool::class, new FloatMapper()) extends PoolMapper {
+            public static function getPoolsArray(): array
+            {
+                return self::$pools;
+            }
+        };
+
+        $this->assertNotEmpty($mapper::getPoolsArray());
+        PoolMapper::freeUpMemory();
+
+        $this->assertEmpty($mapper::getPoolsArray());
+        $this->assertSame(100.0, $pool->getCurrent());
+        $this->assertSame(10.0, $pool->getPool());
+        $this->assertSame(110.0, $pool->getResult());
+
+        $mapper->serialize($pool);
+        $this->assertSame([$pool], $mapper::getPoolsArray());
+        $this->assertSame(100.0, $pool->getCurrent());
+        $this->assertSame(10.0, $pool->getPool());
+        $this->assertSame(110.0, $pool->getResult());
+
+        $mapper::merge();
+        $this->assertEmpty($mapper::getPoolsArray());
+        $this->assertSame(110.0, $pool->getCurrent());
+        $this->assertSame(0.0, $pool->getPool());
+        $this->assertSame(110.0, $pool->getResult());
+    }
 }

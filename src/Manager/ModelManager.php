@@ -19,6 +19,7 @@ use DiBify\DiBify\Id\IdGeneratorInterface;
 use DiBify\DiBify\Locker\Lock\ServiceLock;
 use DiBify\DiBify\Locker\Lock\Lock;
 use DiBify\DiBify\Locker\LockerInterface;
+use DiBify\DiBify\Mappers\PoolMapper;
 use DiBify\DiBify\Model\ModelAfterCommitEventInterface;
 use DiBify\DiBify\Model\ModelBeforeCommitEventInterface;
 use DiBify\DiBify\Model\ModelInterface;
@@ -358,6 +359,8 @@ class ModelManager implements FreeUpMemoryInterface
 
             $transaction->triggerEvent(TransactionEvent::AFTER_COMMIT);
 
+            PoolMapper::merge();
+
             if ($lock instanceof ServiceLock) {
                 $this->unlock($models, $lock);
             }
@@ -376,6 +379,7 @@ class ModelManager implements FreeUpMemoryInterface
     {
         Reference::freeUpMemory();
         Transaction::freeUpMemory();
+        PoolMapper::freeUpMemory();
         foreach ($this->repositories as $repository) {
             $repository->freeUpMemory();
         }

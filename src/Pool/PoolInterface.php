@@ -23,4 +23,6 @@ interface PoolInterface
 
     public function subtract($value): void;
 
+    public function merge(): void;
+
 }
