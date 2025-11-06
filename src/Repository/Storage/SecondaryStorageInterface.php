@@ -21,4 +21,6 @@ interface SecondaryStorageInterface extends StorageInterface
      */
     public function replication(array $insert, array $update, array $delete): void;
 
+    public function countTotal(): int;
+
 }

@@ -22,6 +22,8 @@ interface PrimaryStorageInterface extends StorageInterface
 
     public function countForReplicationSync(DateTimeImmutable $gte): int;
 
+    public function countTotal(): int;
+
     public function getVersionField(): string;
 
 }
