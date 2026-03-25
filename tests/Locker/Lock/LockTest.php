@@ -36,6 +36,13 @@ class LockTest extends TestCase
         $this->lock_2 = new Lock(Reference::to($this->locker));
     }
 
+    public function testConstructWithExplicitNulls(): void
+    {
+        $lock = new Lock($this->locker, null, null);
+        $this->assertNull($lock->getIdentity());
+        $this->assertNull($lock->getTimeout());
+    }
+
     public function testGetLocker(): void
     {
         $this->assertSame(Reference::to($this->locker), $this->lock_1->getLocker());
