@@ -20,13 +20,16 @@ class Sorting
 
     private string $direction;
 
+    private ?self $next;
+
     /**
      * Sort constructor.
      * @param string $field
      * @param string $direction
+     * @param self|null $next
      * @throws InvalidArgumentException
      */
-    public function __construct(string $field, string $direction = self::SORT_DESC)
+    public function __construct(string $field, string $direction = self::SORT_DESC, ?self $next = null)
     {
         $this->field = $field;
 
@@ -35,6 +38,7 @@ class Sorting
         }
 
         $this->direction = $direction;
+        $this->next = $next;
     }
 
     public function getField(): string
@@ -45,6 +49,25 @@ class Sorting
     public function getDirection(): string
     {
         return $this->direction;
+    }
+
+    public function getNext(): ?self
+    {
+        return $this->next;
+    }
+
+    /**
+     * @return self[]
+     */
+    public function getSortingArray(): array
+    {
+        $result = [];
+        $current = $this;
+        while ($current !== null) {
+            $result[] = $current;
+            $current = $current->next;
+        }
+        return $result;
     }
 
 }
